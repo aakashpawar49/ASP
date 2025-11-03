@@ -1,54 +1,90 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../services/api'; // Import our new API file
+import { toast } from 'react-hot-toast'; // Import toast for error messages
+import LoadingScreen from '../components/LoadingScreen';
 
 // 1. Create the Context
 const AuthContext = createContext();
 
 // 2. Create the Provider Component
-// This component will wrap our entire app and manage the auth state.
 const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // The logged-in user object
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // Add loading state
   const navigate = useNavigate();
 
-  // --- MOCK AUTH FUNCTIONS ---
-  // We will replace these with real API calls to our ASP.NET backend.
+  // --- NEW: Check for a token on app load ---
+  useEffect(() => {
+    // This function runs when the app first loads
+    const loadUserFromToken = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        // We have a token. We need to verify it and get user data.
+        // For now, we'll just assume the token is valid
+        // In a real app, you'd make an API call here to '/api/auth/me'
+        // For this project, we'll just re-login if the email is stored (simple mock)
+        console.log("Found token, but can't verify yet.");
+      }
+      setLoading(false); // Stop loading
+    };
+    loadUserFromToken();
+  }, []);
 
   /**
-   * Logs a user in. In a real app, this would call the API.
-   * @param {string} email
-   * @param {string} password
+   * Logs a user in by calling the API.
    */
-  const login = (email, password) => {
-    console.log('Logging in with:', email, password);
+  const login = async (email, password) => {
+    try {
+      // 1. Call the API endpoint
+      const response = await api.post('/auth/login', {
+        email,
+        password
+      });
 
-    // --- MOCK LOGIC ---
-    // Let's pretend the API returns a user object based on the email.
-    let mockUser;
-    let redirectTo;
+      // 2. We got a successful response (user + token)
+      const userData = response.data;
 
-    if (email.includes('admin')) {
-      mockUser = { email: email, role: 'Admin', token: 'fake-admin-token' };
-      redirectTo = '/admin/dashboard';
-    } else if (email.includes('student')) {
-      mockUser = { email: email, role: 'Student', token: 'fake-student-token' };
-      redirectTo = '/student/dashboard';
-    } else if (email.includes('labtech')) {
-      mockUser = { email: email, role: 'LabTech', token: 'fake-labtech-token' };
-      redirectTo = '/labtech/dashboard';
-    } else {
-      // Default to teacher for this mock
-      mockUser = { email: email, role: 'Teacher', token: 'fake-teacher-token' };
-      redirectTo = '/teacher/dashboard';
+      // 3. Save the user to state
+      setUser(userData);
+
+      // 4. Save the token to localStorage
+      localStorage.setItem('token', userData.token);
+
+      // 5. Show success and navigate
+      toast.success(`Welcome back, ${userData.name}!`);
+      
+      // Navigate based on role
+      redirectToRoleDashboard(userData.role);
+
+    } catch (error) {
+      // 5. Handle errors
+      console.error("Login failed:", error.response);
+      toast.error(error.response?.data || "Invalid email or password.");
     }
-    
-    // Save the user in state
-    setUser(mockUser);
-    
-    // In a real app, you'd save the token to localStorage
-    // localStorage.setItem('token', mockUser.token);
+  };
 
-    // Redirect to the correct dashboard
-    navigate(redirectTo);
+  /**
+   * Registers a new user by calling the API.
+   */
+  const register = async (name, email, role, password) => {
+    try {
+      // 1. Call the API endpoint
+      await api.post('/auth/register', {
+        name,
+        email,
+        role,
+        password
+      });
+
+      // 2. Show success and navigate
+      toast.success("Registration successful! Please log in.");
+      navigate('/login');
+
+    } catch (error) {
+      // 3. Handle errors
+      console.error("Registration failed:", error.response);
+      toast.error(error.response?.data || "Registration failed.");
+    }
   };
 
   /**
@@ -57,21 +93,30 @@ const AuthProvider = ({ children }) => {
   const logout = () => {
     console.log('Logging out');
     setUser(null);
-    // localStorage.removeItem('token');
+    localStorage.removeItem('token');
     navigate('/login');
+    toast.success("Logged out successfully.");
   };
 
-  /**
-   * Registers a new user. In a real app, this would call the API.
-   */
-  const register = (name, email, password) => {
-    console.log('Registering:', name, email, password);
-    
-    // --- MOCK LOGIC ---
-    // Pretend the API call is successful and redirects to login.
-    alert('Registration successful! Please log in.');
-    navigate('/login');
+  // Helper function to redirect
+  const redirectToRoleDashboard = (role) => {
+    if (role === 'Admin') {
+      navigate('/admin/dashboard');
+    } else if (role === 'Student') {
+      navigate('/student/dashboard');
+    } else if (role === 'LabTech') {
+      navigate('/labtech/dashboard');
+    } else if (role === 'Teacher') {
+      navigate('/teacher/dashboard');
+    } else {
+      navigate('/'); // Default
+    }
   };
+
+  // Show a loading screen while we check for a token
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   // 3. The value to pass to all children
   const value = {
