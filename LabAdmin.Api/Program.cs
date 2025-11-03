@@ -1,36 +1,59 @@
-using LabAdmin.Api.Data; // Import your Data folder
-using Microsoft.EntityFrameworkCore; // Import Entity Framework
+using LabAdmin.Api.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- Add services to the container ---
-
-// 1. Get Connection String
+// --- Get Connection String ---
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// 2. Add CORS
+// --- Add services to the container ---
+
+// Add CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
         policy =>
         {
-            // This is the URL of your React dev server
+            // This is your React app's URL
             policy.WithOrigins("http://localhost:5173") 
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
 });
 
-// 3. Add DbContext
+// Add DbContext for MySQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-// 4. Add Controllers
+// Add Controllers
 builder.Services.AddControllers();
 
 // Add Swagger/OpenAPI for API testing
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// ADD JWT AUTHENTICATION
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});
 
 // --- Build the App ---
 var app = builder.Build();
@@ -44,11 +67,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// 5. Use CORS (Must be before UseAuthorization)
+// --- CONFIGURE MIDDLEWARE ---
+// The order of these is important!
 app.UseCors("AllowReactApp");
 
-app.UseAuthorization();
+app.UseAuthentication(); 
+app.UseAuthorization();  
 
 app.MapControllers();
 
+// Start the server
 app.Run();
