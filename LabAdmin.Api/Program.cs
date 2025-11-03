@@ -1,5 +1,5 @@
-using LabAdmin.Api.Data;
-using Microsoft.EntityFrameworkCore;
+using LabAdmin.Api.Data; // Import your Data folder
+using Microsoft.EntityFrameworkCore; // Import Entity Framework
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +14,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowReactApp",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173") // Your React app's URL
+            // This is the URL of your React dev server
+            policy.WithOrigins("http://localhost:5173") 
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
