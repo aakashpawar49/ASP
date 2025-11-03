@@ -3,7 +3,8 @@ import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
 // Import Layouts
-import Layout from './components/Layout';
+import PublicLayout from './components/PublicLayout';
+import DashboardLayout from './components/DashboardLayout';
 import ProtectedRoute from './components/ProtectedRoute'; // <-- 1. IMPORT
 
 // Import Pages
@@ -15,11 +16,8 @@ import StudentDashboard from './pages/StudentDashboard';
 import LabTechDashboard from './pages/LabTechDashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
 import NotFound from './pages/NotFound';
-// Removed LoadingScreen, as AuthContext handles this
 
 function App() {
-  // 2. Removed the 'booting' state and useEffect.
-  // AuthContext now shows a LoadingScreen while checking for a token.
 
   return (
     <>
@@ -27,8 +25,8 @@ function App() {
 
       <Routes>
         {/* === Public Routes === */}
-        {/* These routes are wrapped in the Layout (Header/Footer) */}
-        <Route element={<Layout />}>
+        {/* These routes are wrapped in the PublicLayout (Header/Footer) */}
+        <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
         </Route>
 
@@ -43,7 +41,7 @@ function App() {
 
         {/* Admin Dashboard */}
         <Route element={<ProtectedRoute allowedRoles={['Admin']} />}>
-          <Route element={<Layout />}>
+          <Route element={<DashboardLayout />}>
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             {/* Add more admin-only routes here */}
           </Route>
@@ -51,14 +49,14 @@ function App() {
 
         {/* Student Dashboard */}
         <Route element={<ProtectedRoute allowedRoles={['Student']} />}>
-          <Route element={<Layout />}>
+          <Route element={<DashboardLayout />}>
             <Route path="/student/dashboard" element={<StudentDashboard />} />
           </Route>
         </Route>
 
         {/* LabTech Dashboard */}
         <Route element={<ProtectedRoute allowedRoles={['LabTech']} />}>
-          <Route element={<Layout />}>
+          <Route element={<DashboardLayout />}>
             <Route path="/labtech/dashboard" element={<LabTechDashboard />} />
           </Route>
         </Route>
@@ -66,7 +64,7 @@ function App() {
         {/* Teacher Dashboard */}
         <Route element={<ProtectedRoute allowedRoles={['Teacher', 'Admin']} />}>
           {/* Note: We can allow Admins to see teacher pages too */}
-          <Route element={<Layout />}>
+          <Route element={<DashboardLayout />}>
             <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
           </Route>
         </Route>
