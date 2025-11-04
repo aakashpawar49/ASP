@@ -76,6 +76,8 @@ import StudentReportIssue from './pages/StudentReportIssue';
 
 import Profile from './pages/Profile';
 
+import TicketsPage from './pages/TicketsPage';
+
 
 
 function App() {
@@ -171,6 +173,8 @@ function App() {
           {/* Shared Routes */}
 
           <Route path="/profile" element={<Profile />} />
+
+          <Route path="/tickets" element={<TicketsPage />} />
 
         </Route>
 
