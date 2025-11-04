@@ -5,18 +5,20 @@ import LoadingScreen from '../components/LoadingScreen';
 import StatCard from '../components/dashboard/StatCard';
 import RecentTickets from '../components/dashboard/RecentTickets';
 import OpenTicketsChart from '../components/dashboard/OpenTicketsChart';
-import MonthlyBugsChart from '../components/dashboard/MonthlyBugsChart'; // We've added this
-import { Ticket, Wrench, Bug, Hourglass } from 'lucide-react'; // Icons for the stat cards
+import MonthlyBugsChart from '../components/dashboard/MonthlyBugsChart';
+import LabStatistics from '../components/dashboard/LabStatistics';
+import { Ticket, Wrench, Bug, Hourglass } from 'lucide-react';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // This hook fetches the data for the 4 stat cards
+  // This hook fetches the data for the 4 stat cards at the top
   useEffect(() => {
     const fetchStats = async () => {
       try {
         setIsLoading(true);
+        // Calls the /api/dashboard/admin-stats endpoint
         const response = await api.get('/dashboard/admin-stats');
         setStats(response.data);
       } catch (error) {
@@ -30,18 +32,18 @@ const AdminDashboard = () => {
     fetchStats();
   }, []); // The empty array means this effect runs only once
 
-  // Show a loading screen while fetching
+  // Show a loading screen while fetching the stats
   if (isLoading || !stats) {
     return <LoadingScreen />;
   }
 
-  // Helper component for the chart placeholders we haven't built yet
+  // A helper component for the one remaining placeholder
   const PlaceholderWidget = ({ title, className = "" }) => (
     <div className={`bg-gray-800 p-6 rounded-xl shadow-lg ${className}`}>
       <h3 className="text-xl font-semibold text-white mb-4">{title}</h3>
       <div className="text-gray-400">
         <p>Chart component will go here.</p>
-        <p>(Waiting for backend endpoint and 'recharts' integration)</p>
+        <p>(Waiting for the Technician Performance API endpoint)</p>
       </div>
     </div>
   );
@@ -74,7 +76,7 @@ const AdminDashboard = () => {
         />
       </div>
 
-      {/* Renders the main dashboard grid */}
+      {/* Renders the main dashboard grid, matching your screenshot */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
         
         {/* Monthly Bugs Fixed Chart (Real) */}
@@ -87,14 +89,16 @@ const AdminDashboard = () => {
           <OpenTicketsChart />
         </div>
         
-        {/* Technician Performance (Placeholder) */}
+        {/* Technician Performance (The LAST Placeholder) */}
         <PlaceholderWidget 
           title="Technician Performance" 
           className="lg:col-span-2"
         />
         
-        {/* Lab Statistics (Placeholder) */}
-        <PlaceholderWidget title="Lab Statistics" />
+        {/* Lab Statistics (Real) */}
+        <div>
+          <LabStatistics />
+        </div>
         
         {/* Recent Tickets List (Real) */}
         <div className="lg:col-span-2">
@@ -106,3 +110,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+
