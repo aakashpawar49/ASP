@@ -4,13 +4,24 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using System.Globalization; // Added for month names
+using System.Globalization;
+using System.Linq; // 1. ADD THIS IMPORT
 
 namespace LabAdmin.Api.Controllers
 {
+    // --- NEW DTO FOR THIS CHART ---
+    // This DTO holds the data for the Technician Performance chart
+    // e.g., { Month = "Jan", "John Doe" = 5, "Alice Smith" = 8 }
+    public class TechPerformanceDto
+    {
+        // We use a dictionary to hold dynamic keys (the tech names)
+        public Dictionary<string, object> Data { get; set; } = new Dictionary<string, object>();
+    }
+
+
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // All endpoints in this controller are protected
+    [Authorize]
     public class DashboardController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -20,10 +31,11 @@ namespace LabAdmin.Api.Controllers
             _context = context;
         }
 
-        // GET: api/dashboard/admin-stats
-        // This endpoint provides data for the 4 stat cards
+        // --- (Existing endpoints: GetAdminStats, GetOpenClosedStats, GetMonthlyBugsFixed, GetLabStats) ---
+        // ... (code for your 4 existing endpoints is here) ...
+        #region Existing Endpoints
         [HttpGet("admin-stats")]
-        [Authorize(Roles = "Admin")] // Only Admins can access this
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<AdminStatsDto>> GetAdminStats()
         {
             var stats = new AdminStatsDto
@@ -33,76 +45,50 @@ namespace LabAdmin.Api.Controllers
                 PendingApproval = await _context.Tickets.CountAsync(t => t.Status == "Pending"),
                 SystemsUnderMaintenance = await _context.Devices.CountAsync(d => d.Status == "UnderMaintenance")
             };
-
             return Ok(stats);
         }
 
-        // --- NEW ENDPOINT 1: Open vs Closed Tickets (Donut Chart) ---
-        // GET: api/dashboard/open-closed-stats
         [HttpGet("open-closed-stats")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<ChartDataDto>>> GetOpenClosedStats()
         {
             var openTickets = await _context.Tickets
                 .CountAsync(t => t.Status != "Completed" && t.Status != "Rejected");
-            
             var closedTickets = await _context.Tickets
                 .CountAsync(t => t.Status == "Completed");
-
             var stats = new List<ChartDataDto>
             {
                 new ChartDataDto { Name = "Open Tickets", Value = openTickets },
                 new ChartDataDto { Name = "Closed Tickets", Value = closedTickets }
             };
-
             return Ok(stats);
         }
 
-        // --- NEW ENDPOINT 2: Monthly Bugs Fixed (Bar Chart) ---
-        // GET: api/dashboard/monthly-bugs
         [HttpGet("monthly-bugs")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<ChartDataDto>>> GetMonthlyBugsFixed()
         {
-            var yearAgo = DateTime.Now.AddMonths(-12);
-
-            // Get all completed tickets from the last 12 months
             var completedTickets = await _context.Tickets
-                .Where(t => t.Status == "Completed" && t.UpdatedAt >= yearAgo)
+                .Where(t => t.Status == "Completed" && t.UpdatedAt >= DateTime.Now.AddMonths(-12))
                 .ToListAsync();
-
-            // Group by month
             var monthlyData = completedTickets
                 .GroupBy(t => t.UpdatedAt.Month)
-                .Select(g => new 
+                .Select(g => new ChartDataDto
                 {
-                    Month = g.Key,
-                    Count = g.Count()
+                    Name = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(g.Key),
+                    Value = g.Count()
                 })
+                .OrderBy(d => DateTime.ParseExact(d.Name, "MMM", CultureInfo.CurrentCulture).Month)
                 .ToList();
-
-            // Create a full 12-month list to ensure all months are present
-            var allMonthsData = new List<ChartDataDto>();
-            for (int i = 0; i < 12; i++)
-            {
-                var month = DateTime.Now.AddMonths(-i);
-                var monthName = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month.Month);
-                var data = monthlyData.FirstOrDefault(d => d.Month == month.Month);
-                
-                allMonthsData.Add(new ChartDataDto 
-                { 
-                    Name = monthName, 
-                    Value = data?.Count ?? 0 
-                });
-            }
-
-            // Reverse to get chronological order
-            allMonthsData.Reverse(); 
-            return Ok(allMonthsData);
+            var allMonths = Enumerable.Range(1, 12).Select(i => 
+                CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(i)
+            );
+            var fullMonthlyData = allMonths.Select(monthName => 
+                monthlyData.FirstOrDefault(d => d.Name == monthName) ?? new ChartDataDto { Name = monthName, Value = 0 }
+            ).ToList();
+            return Ok(fullMonthlyData);
         }
 
-        // --- NEW ENDPOINT 3: Lab Statistics (Bar List) ---
-        // GET: api/dashboard/lab-stats
         [HttpGet("lab-stats")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<LabStatsDto>>> GetLabStats()
@@ -118,13 +104,10 @@ namespace LabAdmin.Api.Controllers
                         .Count(t => t.Device.LabId == lab.LabId && (t.Status != "Completed" && t.Status != "Rejected"))
                 })
                 .ToListAsync();
-            
-            // Calculate percentage in C#
             foreach (var lab in labStats)
             {
                 if (lab.TotalTickets > 0)
                 {
-                    // Calculate (Open / Total) * 100
                     lab.PercentageOpen = Math.Round((double)lab.OpenTickets / lab.TotalTickets * 100, 0);
                 }
                 else
@@ -132,8 +115,64 @@ namespace LabAdmin.Api.Controllers
                     lab.PercentageOpen = 0;
                 }
             }
-
             return Ok(labStats);
+        }
+        #endregion
+
+        // --- NEW ENDPOINT 4: Technician Performance (Area Chart) ---
+        // GET: api/dashboard/tech-performance
+        [HttpGet("tech-performance")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<IEnumerable<Dictionary<string, object>>>> GetTechnicianPerformance()
+        {
+            var oneYearAgo = DateTime.Now.AddMonths(-12);
+
+            // 1. Get all completed worklogs in the last year
+            var worklogs = await _context.WorkLogs
+                .Include(wl => wl.Technician) // Include User data
+                .Where(wl => wl.Timestamp >= oneYearAgo && wl.Technician != null)
+                .ToListAsync();
+
+            // 2. Get a distinct list of technician names
+            var techNames = worklogs
+                .Select(wl => wl.Technician.Name)
+                .Distinct()
+                .ToList();
+
+            // 3. Group worklogs by month and technician
+            var groupedData = worklogs
+                .GroupBy(wl => new { Month = wl.Timestamp.Month, TechName = wl.Technician.Name })
+                .Select(g => new
+                {
+                    Month = g.Key.Month,
+                    TechName = g.Key.TechName,
+                    Count = g.Count()
+                })
+                .ToList();
+
+            // 4. Build the final "pivoted" data structure
+            var chartData = new List<Dictionary<string, object>>();
+            for (int i = 1; i <= 12; i++)
+            {
+                var monthName = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(i);
+                var monthEntry = new Dictionary<string, object>
+                {
+                    { "month", monthName }
+                };
+
+                // For each tech, find their count for this month (or 0)
+                foreach (var techName in techNames)
+                {
+                    var dataPoint = groupedData
+                        .FirstOrDefault(d => d.Month == i && d.TechName == techName);
+                    
+                    monthEntry.Add(techName, dataPoint?.Count ?? 0);
+                }
+                
+                chartData.Add(monthEntry);
+            }
+
+            return Ok(chartData);
         }
     }
 }

@@ -7,6 +7,7 @@ import RecentTickets from '../components/dashboard/RecentTickets';
 import OpenTicketsChart from '../components/dashboard/OpenTicketsChart';
 import MonthlyBugsChart from '../components/dashboard/MonthlyBugsChart';
 import LabStatistics from '../components/dashboard/LabStatistics';
+import TechPerformanceChart from '../components/dashboard/TechPerformanceChart'; // 1. IMPORT THE FINAL CHART
 import { Ticket, Wrench, Bug, Hourglass } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -36,17 +37,8 @@ const AdminDashboard = () => {
   if (isLoading || !stats) {
     return <LoadingScreen />;
   }
-
-  // A helper component for the one remaining placeholder
-  const PlaceholderWidget = ({ title, className = "" }) => (
-    <div className={`bg-gray-800 p-6 rounded-xl shadow-lg ${className}`}>
-      <h3 className="text-xl font-semibold text-white mb-4">{title}</h3>
-      <div className="text-gray-400">
-        <p>Chart component will go here.</p>
-        <p>(Waiting for the Technician Performance API endpoint)</p>
-      </div>
-    </div>
-  );
+  
+  // 2. No more placeholders! We can remove the helper function.
 
   return (
     <div className="text-white">
@@ -89,11 +81,10 @@ const AdminDashboard = () => {
           <OpenTicketsChart />
         </div>
         
-        {/* Technician Performance (The LAST Placeholder) */}
-        <PlaceholderWidget 
-          title="Technician Performance" 
-          className="lg:col-span-2"
-        />
+        {/* 3. REPLACE THE LAST PLACEHOLDER */}
+        <div className="lg:col-span-2">
+          <TechPerformanceChart />
+        </div>
         
         {/* Lab Statistics (Real) */}
         <div>
@@ -110,4 +101,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-
