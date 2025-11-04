@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
-import api from '../services/api'; // Your API service
-import LoadingScreen from '../components/LoadingScreen'; // Your loading component
-import StatCard from '../components/dashboard/StatCard'; // The new stat card widget
-import RecentTickets from '../components/dashboard/RecentTickets'; // The new recent tickets widget
+import api from '../services/api';
+import LoadingScreen from '../components/LoadingScreen';
+import StatCard from '../components/dashboard/StatCard';
+import RecentTickets from '../components/dashboard/RecentTickets';
+import OpenTicketsChart from '../components/dashboard/OpenTicketsChart';
+import MonthlyBugsChart from '../components/dashboard/MonthlyBugsChart'; // We've added this
 import { Ticket, Wrench, Bug, Hourglass } from 'lucide-react'; // Icons for the stat cards
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // This hook runs when the component mounts
+  // This hook fetches the data for the 4 stat cards
   useEffect(() => {
     const fetchStats = async () => {
       try {
         setIsLoading(true);
-        // 1. Call the admin-stats endpoint we tested in Swagger
         const response = await api.get('/dashboard/admin-stats');
         setStats(response.data);
       } catch (error) {
@@ -34,10 +35,10 @@ const AdminDashboard = () => {
     return <LoadingScreen />;
   }
 
-  // Helper component for the chart placeholders
+  // Helper component for the chart placeholders we haven't built yet
   const PlaceholderWidget = ({ title, className = "" }) => (
-    <div className={`bg-white p-6 rounded-xl shadow-md border border-gray-100 ${className}`}>
-      <h3 className="text-xl font-semibold text-gray-900 mb-4">{title}</h3>
+    <div className={`bg-gray-800 p-6 rounded-xl shadow-lg ${className}`}>
+      <h3 className="text-xl font-semibold text-white mb-4">{title}</h3>
       <div className="text-gray-400">
         <p>Chart component will go here.</p>
         <p>(Waiting for backend endpoint and 'recharts' integration)</p>
@@ -46,11 +47,10 @@ const AdminDashboard = () => {
   );
 
   return (
-    // Main content area
-    <div className="text-black">
-      <h1 className="text-3xl font-bold mb-6 text-gray-900">Overview</h1>
+    <div className="text-white">
+      <h1 className="text-3xl font-bold mb-6">Overview</h1>
 
-      {/* 2. Renders the 4 StatCards with data from the API */}
+      {/* Renders the 4 StatCards with data from the API */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 
           title="Tickets Raised"
@@ -74,28 +74,29 @@ const AdminDashboard = () => {
         />
       </div>
 
-      {/* 3. Renders the main dashboard grid */}
+      {/* Renders the main dashboard grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
         
-        {/* Placeholders for charts (matching your screenshot) */}
-        <PlaceholderWidget 
-          title="Monthly Bugs Fixed" 
-          className="lg:col-span-2" 
-        />
+        {/* Monthly Bugs Fixed Chart (Real) */}
+        <div className="lg:col-span-2">
+          <MonthlyBugsChart />
+        </div>
         
-        <PlaceholderWidget 
-          title="Open vs Closed Tickets" 
-          className="lg:row-span-2"
-        />
-
+        {/* Open vs Closed Chart (Real) */}
+        <div className="lg:row-span-2">
+          <OpenTicketsChart />
+        </div>
+        
+        {/* Technician Performance (Placeholder) */}
         <PlaceholderWidget 
           title="Technician Performance" 
           className="lg:col-span-2"
         />
-
+        
+        {/* Lab Statistics (Placeholder) */}
         <PlaceholderWidget title="Lab Statistics" />
-
-        {/* 4. Renders the real RecentTickets component */}
+        
+        {/* Recent Tickets List (Real) */}
         <div className="lg:col-span-2">
           <RecentTickets />
         </div>
@@ -105,4 +106,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-
