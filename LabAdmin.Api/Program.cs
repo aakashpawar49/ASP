@@ -3,39 +3,64 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.OpenApi.Models; // <-- 1. ADD THIS IMPORT
 
 var builder = WebApplication.CreateBuilder(args);
-
-// --- Get Connection String ---
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 // --- Add services to the container ---
 
-// Add CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
         policy =>
         {
-            // This is your React app's URL
             policy.WithOrigins("http://localhost:5173") 
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
 });
 
-// Add DbContext for MySQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-// Add Controllers
 builder.Services.AddControllers();
-
-// Add Swagger/OpenAPI for API testing
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
-// ADD JWT AUTHENTICATION
+// 2. --- UPDATE ADD SWAGGER GEN ---
+builder.Services.AddSwaggerGen(options =>
+{
+    // This defines the "Authorize" button and how it works
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 12345abcdef\""
+    });
+
+    // This tells Swagger to add the lock icon to all protected endpoints
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
+// --- END OF SWAGGER UPDATE ---
+
+
+// --- ADD JWT AUTHENTICATION ---
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -51,9 +76,10 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
     };
 });
+// --- END OF JWT ---
 
 // --- Build the App ---
 var app = builder.Build();
@@ -66,15 +92,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// --- CONFIGURE MIDDLEWARE ---
-// The order of these is important!
 app.UseCors("AllowReactApp");
 
 app.UseAuthentication(); 
-app.UseAuthorization();  
+app.UseAuthorization();
 
 app.MapControllers();
 
-// Start the server
 app.Run();
