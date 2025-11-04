@@ -97,10 +97,10 @@ const Topbar = () => {
     // 'sticky top-0' makes it stick to the top
     // Clean, white background with a bottom border
     <header className="sticky top-0 flex w-full bg-white border-b border-gray-200 z-40">
-      <div className="flex items-center justify-between grow px-4 sm:px-6 h-16">
-        
-        {/* Left Section (Toggle + Logo) */}
-        <div className="flex items-center gap-4">
+      <div className="flex items-center grow px-4 sm:px-6 h-16">
+
+        {/* Left Section (Toggle) */}
+        <div className="flex items-center">
           {/* === Sidebar Toggle Button (Hamburger) === */}
           <button
             type="button"
@@ -110,8 +110,10 @@ const Topbar = () => {
           >
             {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
+        </div>
 
-          {/* Logo (always visible) */}
+        {/* Center Section (Logo) */}
+        <div className="flex-1 flex justify-center">
           <Link to="/" className="font-bold text-xl text-gray-800">
             LabAdmin
           </Link>
