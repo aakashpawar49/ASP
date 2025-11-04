@@ -1,52 +1,43 @@
 import React from 'react';
 import { useAuth } from '../hooks/useAuth';
-// 1. Import the 'Menu' (sandwich) icon
-import { Search, Moon, Bell, User as UserIcon, Menu } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { User, LogOut } from 'lucide-react';
 
-// 2. Accept the 'toggleSidebar' prop
-const Topbar = ({ toggleSidebar }) => {
+const Topbar = () => {
   const { user, logout } = useAuth();
 
   return (
-    <header className="bg-gray-800 border-b border-gray-700 text-white">
-      <div className="flex items-center justify-between h-16 px-6">
-        
-        <div className="flex items-center space-x-4">
-          {/* 3. Add the toggle button */}
-          <button 
-            onClick={toggleSidebar} 
-            className="text-gray-400 hover:text-white"
-            aria-label="Toggle sidebar"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
+    <header className="bg-white border-b border-gray-200">
+      <div className="container mx-auto px-6 py-4">
+        <div className="flex justify-between items-center">
           
-          {/* Search Bar */}
-          <div className="flex items-center bg-gray-700 rounded-md">
-            <input
-              type="text"
-              placeholder="Search or type command..."
-              className="bg-transparent pl-4 pr-12 py-2 text-white placeholder-gray-400 focus:outline-none"
-            />
-            <kbd className="mr-2 text-xs font-medium text-gray-400 border border-gray-500 rounded p-1">⌘K</kbd>
-          </div>
-        </div>
+          {/* Site Logo/Name */}
+          <Link to="/" className="text-xl font-bold text-gray-800 hover:text-blue-600">
+            LabAdmin
+          </Link>
 
-        {/* User Menu & Icons */}
-        <div className="flex items-center space-x-6">
-          <button className="text-gray-400 hover:text-white">
-            <Moon className="w-5 h-5" />
-          </button>
-          <button className="text-gray-400 hover:text-white relative">
-            <Bell className="w-5 h-5" />
-            <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-          </button>
-
-          <div className="flex items-center space-x-2">
-            <UserIcon className="w-6 h-6 rounded-full bg-gray-700 p-1" />
-            <span className="text-sm font-medium">{user?.name || 'User'}</span>
-            <button onClick={logout} className="text-sm text-gray-400 hover:text-white">
-              (Logout)
+          {/* User Menu */}
+          <div className="flex items-center space-x-4">
+            <span className="text-sm text-gray-700">
+              Hi User({user?.name || 'User'})
+            </span>
+            
+            {/* Profile Button */}
+            <Link
+              to="/profile"
+              className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            >
+              <User className="w-4 h-4" />
+              <span>Profile</span>
+            </Link>
+            
+            {/* Logout Button */}
+            <button
+              onClick={logout}
+              className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Logout</span>
             </button>
           </div>
         </div>

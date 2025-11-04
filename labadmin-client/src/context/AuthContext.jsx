@@ -54,7 +54,17 @@ const AuthProvider = ({ children }) => {
       toast.success(`Welcome back, ${userData.name}!`);
       
       // Navigate based on role
-      redirectToRoleDashboard(userData.role);
+      if (userData.role === 'Admin') {
+        navigate('/admin/dashboard');
+      } else if (userData.role === 'Teacher') {
+        navigate('/teacher/dashboard');
+      } else if (userData.role === 'Student') {
+        navigate('/student/dashboard');
+      } else if (userData.role === 'LabTech') {
+        navigate('/labtech/dashboard');
+      } else {
+        navigate('/'); // Default fallback
+      }
 
     } catch (error) {
       // 5. Handle errors
@@ -96,21 +106,6 @@ const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     navigate('/login');
     toast.success("Logged out successfully.");
-  };
-
-  // Helper function to redirect
-  const redirectToRoleDashboard = (role) => {
-    if (role === 'Admin') {
-      navigate('/admin/dashboard');
-    } else if (role === 'Student') {
-      navigate('/student/dashboard');
-    } else if (role === 'LabTech') {
-      navigate('/labtech/dashboard');
-    } else if (role === 'Teacher') {
-      navigate('/teacher/dashboard');
-    } else {
-      navigate('/'); // Default
-    }
   };
 
   // Show a loading screen while we check for a token
