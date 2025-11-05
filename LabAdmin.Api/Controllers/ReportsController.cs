@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Collections.Generic; // Required for List<>
+using System.Globalization;     // Required for Month Names
 
 namespace LabAdmin.Api.Controllers
 {
@@ -43,7 +45,44 @@ namespace LabAdmin.Api.Controllers
             return Ok(auditLogs);
         }
 
-        // We can add other report endpoints here later, like:
-        // GET: api/reports/usagestats
+        // GET: api/reports/usage
+        // Fetches stats for the Usage Reports page
+        [HttpGet("usage")]
+        public async Task<ActionResult<UsageReportDto>> GetUsageStats()
+        {
+            // 1. Get Tickets Resolved Per Lab
+            var ticketsPerLab = await _context.Tickets
+                .Where(t => t.Status == "Completed")
+                .Include(t => t.Device.Lab)
+                .GroupBy(t => t.Device.Lab.LabName)
+                .Select(g => new ChartDataDto
+                {
+                    Name = g.Key, // Lab Name
+                    Value = g.Count() // Count of completed tickets
+                })
+                .OrderByDescending(x => x.Value)
+                .ToListAsync();
+
+            // 2. Get Top 5 Software Requests
+            var topSoftware = await _context.SoftwareRequests
+                .GroupBy(sr => sr.SoftwareName)
+                .Select(g => new ChartDataDto
+                {
+                    Name = g.Key, // Software Name
+                    Value = g.Count() // Number of times requested
+                })
+                .OrderByDescending(x => x.Value)
+                .Take(5)
+                .ToListAsync();
+            
+            // 3. Bundle and Return
+            var report = new UsageReportDto
+            {
+                TicketsResolvedPerLab = ticketsPerLab,
+                TopSoftwareRequests = topSoftware
+            };
+
+            return Ok(report);
+        }
     }
 }
