@@ -208,7 +208,7 @@ const Sidebar = () => {
         <div className={`flex items-center h-16 px-6 border-b border-gray-200 ${!showText && 'justify-center'}`}>
           <Link to="/" className="flex items-center gap-2">
             {/* Simple Logo Icon */}
-            <div className="w-8 h-8 bg-linear-to-r from-blue-500 to-indigo-600 rounded-lg flex-shrink-0" />
+            <div className="w-8 h-8 bg-linear-to-r from-blue-500 to-indigo-600 rounded-lg shrink-0" />
             {showText && <span className="font-bold text-xl text-gray-800">LabAdmin</span>}
           </Link>
         </div>
