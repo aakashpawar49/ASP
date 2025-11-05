@@ -140,8 +140,6 @@ const Sidebar = () => {
           { type: 'link', to: '/admin/users', icon: Users, title: 'Users Management' },
           { type: 'link', to: '/admin/tickets', icon: Ticket, title: 'Tickets / Issues' },
           { type: 'link', to: '/admin/software', icon: Package, title: 'Software Requests' },
-          { type: 'link', to: '/admin/inventory', icon: Archive, title: 'Inventory' },
-          { type: 'link', to: '/admin/scheduling', icon: Calendar, title: 'Scheduling' },
           { type: 'dropdown', title: 'Reports', icon: BarChart3, children: [
             { to: '/admin/reports/usage', title: 'Usage Reports' },
             { to: '/admin/reports/audit', title: 'Audit Trail' },
@@ -156,8 +154,7 @@ const Sidebar = () => {
       case 'LabTech':
         return [
           { type: 'link', to: '/labtech/dashboard', icon: LayoutDashboard, title: 'My Dashboard' },
-          { type:link, to: '/labtech/tickets', icon: Ticket, title: 'My Assigned Tickets' },
-          { type: 'link', to: '/labtech/inventory', icon: Archive, title: 'Inventory' },
+          { type: 'link', to: '/labtech/tickets', icon: Ticket, title: 'My Assigned Tickets' },
           ...baseNav
         ];
 
@@ -167,7 +164,6 @@ const Sidebar = () => {
           { type: 'link', to: '/teacher/dashboard', icon: LayoutDashboard, title: 'My Dashboard' },
           { type: 'link', to: '/teacher/request-software', icon: Package, title: 'Request Software' },
           { type: 'link', to: '/teacher/report-issue', icon: Ticket, title: 'Report an Issue' },
-          { type: 'link', to: '/teacher/schedule', icon: Calendar, title: 'Book a Lab' },
           ...baseNav
         ];
       

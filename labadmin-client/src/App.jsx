@@ -48,10 +48,6 @@ import TicketsManagement from './pages/TicketsManagement';
 
 import SoftwareRequests from './pages/SoftwareRequests';
 
-import InventoryManagement from './pages/InventoryManagement';
-
-import SchedulingManagement from './pages/SchedulingManagement';
-
 import UsageReports from './pages/UsageReports';
 
 import AuditTrail from './pages/AuditTrail';
@@ -61,14 +57,8 @@ import RolesPermissions from './pages/RolesPermissions';
 import NotificationsSettings from './pages/NotificationsSettings';
 
 import LabTechTickets from './pages/LabTechTickets';
-
-import LabTechInventory from './pages/LabTechInventory';
-
 import TeacherRequestSoftware from './pages/TeacherRequestSoftware';
-
 import TeacherReportIssue from './pages/TeacherReportIssue';
-
-import TeacherSchedule from './pages/TeacherSchedule';
 
 import StudentRequestSoftware from './pages/StudentRequestSoftware';
 
@@ -124,10 +114,6 @@ function App() {
 
           <Route path="/admin/software" element={<SoftwareRequests />} />
 
-          <Route path="/admin/inventory" element={<InventoryManagement />} />
-
-          <Route path="/admin/scheduling" element={<SchedulingManagement />} />
-
           <Route path="/admin/reports/usage" element={<UsageReports />} />
 
           <Route path="/admin/reports/audit" element={<AuditTrail />} />
@@ -144,8 +130,6 @@ function App() {
 
           <Route path="/labtech/tickets" element={<LabTechTickets />} />
 
-          <Route path="/labtech/inventory" element={<LabTechInventory />} />
-
 
 
           {/* Teacher Routes */}
@@ -155,8 +139,6 @@ function App() {
           <Route path="/teacher/request-software" element={<TeacherRequestSoftware />} />
 
           <Route path="/teacher/report-issue" element={<TeacherReportIssue />} />
-
-          <Route path="/teacher/schedule" element={<TeacherSchedule />} />
 
 
 
