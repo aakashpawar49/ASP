@@ -118,6 +118,23 @@ const Sidebar = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const { user } = useAuth();
 
+  // Helper function to get the dashboard path based on user role
+  const getDashboardPath = () => {
+    if (!user) return '/';
+    switch (user.role) {
+      case 'Admin':
+        return '/admin/dashboard';
+      case 'Student':
+        return '/student/dashboard';
+      case 'LabTech':
+        return '/labtech/dashboard';
+      case 'Teacher':
+        return '/teacher/dashboard';
+      default:
+        return '/';
+    }
+  };
+
   // This function builds the navigation menu based on user role
   const getNavItems = () => {
     // Default for all logged-in users
@@ -206,7 +223,7 @@ const Sidebar = () => {
       >
         {/* Logo/Title */}
         <div className={`flex items-center h-16 px-6 border-b border-gray-200 ${!showText && 'justify-center'}`}>
-          <Link to="/" className="flex items-center gap-2">
+          <Link to={getDashboardPath()} className="flex items-center gap-2">
             {/* Simple Logo Icon */}
             <div className="w-8 h-8 bg-linear-to-r from-blue-500 to-indigo-600 rounded-lg shrink-0" />
             {showText && <span className="font-bold text-xl text-gray-800">LabAdmin</span>}

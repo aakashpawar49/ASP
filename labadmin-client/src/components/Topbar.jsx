@@ -4,6 +4,23 @@ import { useSidebar } from '../context/SidebarContext';
 import { useAuth } from '../hooks/useAuth';
 import { Menu, X, Bell, User as UserIcon, LogOut, Settings } from 'lucide-react'; // Added new icons
 
+// Helper function to get the dashboard path based on user role
+const getDashboardPath = (user) => {
+  if (!user) return '/';
+  switch (user.role) {
+    case 'Admin':
+      return '/admin/dashboard';
+    case 'Student':
+      return '/student/dashboard';
+    case 'LabTech':
+      return '/labtech/dashboard';
+    case 'Teacher':
+      return '/teacher/dashboard';
+    default:
+      return '/';
+  }
+};
+
 // --- Placeholder Components ---
 
 // Simple notification bell
@@ -83,6 +100,7 @@ const UserDropdown = () => {
 const Topbar = () => {
   // Get state and functions from our SidebarContext
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
+  const { user } = useAuth();
 
   // Function to decide which toggle to use (desktop or mobile)
   const handleToggle = () => {
@@ -114,7 +132,7 @@ const Topbar = () => {
 
         {/* Center Section (Logo) */}
         <div className="flex-1 flex justify-center">
-          <Link to="/" className="font-bold text-xl text-gray-800">
+          <Link to={getDashboardPath(user)} className="font-bold text-xl text-gray-800">
             LabAdmin
           </Link>
         </div>

@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api'; // Import our new API file
-import { toast } from 'react-hot-toast'; // Import toast for error messages
+import api from '../services/api'; // Your API service
+import { toast } from 'react-hot-toast';
 import LoadingScreen from '../components/LoadingScreen';
 
 // 1. Create the Context
@@ -10,102 +10,97 @@ const AuthContext = createContext();
 // 2. Create the Provider Component
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true); // Start as true
   const navigate = useNavigate();
 
-  // --- NEW: Check for a token on app load ---
+  // --- THIS IS THE CRITICAL FIX ---
   useEffect(() => {
     // This function runs when the app first loads
     const loadUserFromToken = async () => {
       const token = localStorage.getItem('token');
+      
       if (token) {
-        // We have a token. We need to verify it and get user data.
-        // For now, we'll just assume the token is valid
-        // In a real app, you'd make an API call here to '/api/auth/me'
-        // For this project, we'll just re-login if the email is stored (simple mock)
-        console.log("Found token, but can't verify yet.");
+        // We have a token. Let's verify it and get the user's data.
+        try {
+          // Set the token on our api instance (in case this is the first load)
+          api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          
+          // Call the /api/users/me endpoint we built for the profile page
+          const response = await api.get('/users/me');
+          
+          // We got the user data! Set it in our state.
+          setUser(response.data);
+          
+        } catch (error) {
+          // The token was invalid or expired
+          console.error("Failed to load user from token:", error);
+          localStorage.removeItem('token'); // Clear the bad token
+          setUser(null);
+        }
       }
-      setLoading(false); // Stop loading
+      
+      // We're done loading, whether we found a user or not
+      setLoading(false);
     };
-    loadUserFromToken();
-  }, []);
 
-  /**
-   * Logs a user in by calling the API.
-   */
+    loadUserFromToken();
+  }, []); // The empty array [] means this runs only ONCE on app load
+
+  
   const login = async (email, password) => {
     try {
-      // 1. Call the API endpoint
-      const response = await api.post('/auth/login', {
-        email,
-        password
-      });
-
-      // 2. We got a successful response (user + token)
+      const response = await api.post('/auth/login', { email, password });
       const userData = response.data;
-
-      // 3. Save the user to state
-      setUser(userData);
-
-      // 4. Save the token to localStorage
-      localStorage.setItem('token', userData.token);
-
-      // 5. Show success and navigate
-      toast.success(`Welcome back, ${userData.name}!`);
       
-      // Navigate based on role
-      if (userData.role === 'Admin') {
-        navigate('/admin/dashboard');
-      } else if (userData.role === 'Teacher') {
-        navigate('/teacher/dashboard');
-      } else if (userData.role === 'Student') {
-        navigate('/student/dashboard');
-      } else if (userData.role === 'LabTech') {
-        navigate('/labtech/dashboard');
-      } else {
-        navigate('/'); // Default fallback
-      }
+      setUser(userData);
+      localStorage.setItem('token', userData.token);
+      
+      // Set the token for all future requests
+      api.defaults.headers.common['Authorization'] = `Bearer ${userData.token}`;
+      
+      toast.success(`Welcome back, ${userData.name}!`);
+      redirectToRoleDashboard(userData.role);
 
     } catch (error) {
-      // 5. Handle errors
       console.error("Login failed:", error.response);
       toast.error(error.response?.data || "Invalid email or password.");
     }
   };
 
-  /**
-   * Registers a new user by calling the API.
-   */
   const register = async (name, email, role, password) => {
     try {
-      // 1. Call the API endpoint
-      await api.post('/auth/register', {
-        name,
-        email,
-        role,
-        password
-      });
-
-      // 2. Show success and navigate
+      await api.post('/auth/register', { name, email, role, password });
       toast.success("Registration successful! Please log in.");
       navigate('/login');
-
     } catch (error) {
-      // 3. Handle errors
       console.error("Registration failed:", error.response);
       toast.error(error.response?.data || "Registration failed.");
     }
   };
 
-  /**
-   * Logs a user out.
-   */
   const logout = () => {
     console.log('Logging out');
     setUser(null);
     localStorage.removeItem('token');
+    // Remove the token from the api headers
+    delete api.defaults.headers.common['Authorization'];
     navigate('/login');
     toast.success("Logged out successfully.");
+  };
+
+  // Helper function to redirect
+  const redirectToRoleDashboard = (role) => {
+    if (role === 'Admin') {
+      navigate('/admin/dashboard');
+    } else if (role === 'Student') {
+      navigate('/student/dashboard');
+    } else if (role === 'LabTech') {
+      navigate('/labtech/dashboard');
+    } else if (role === 'Teacher') {
+      navigate('/teacher/dashboard');
+    } else {
+      navigate('/'); // Default
+    }
   };
 
   // Show a loading screen while we check for a token

@@ -6,12 +6,13 @@ import { useAuth } from '../hooks/useAuth';
 import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 
-// Status component
-const TicketStatus = ({ status }) => {
+// Reusable Status component
+const RequestStatus = ({ status }) => {
   const colors = {
     Pending: 'bg-yellow-900 text-yellow-300',
     Assigned: 'bg-blue-900 text-blue-300',
     InProgress: 'bg-indigo-900 text-indigo-300',
+    Approved: 'bg-green-900 text-green-300',
     Completed: 'bg-green-900 text-green-300',
     Rejected: 'bg-red-900 text-red-300',
   };
@@ -36,6 +37,7 @@ const StudentDashboard = () => {
         const ticketPromise = api.get('/tickets/my-requests');
         const softwarePromise = api.get('/softwarerequests/my-requests');
         
+        // Wait for both to complete
         const [ticketResponse, softwareResponse] = await Promise.all([
           ticketPromise,
           softwarePromise
@@ -60,11 +62,11 @@ const StudentDashboard = () => {
 
   return (
     <div className="text-white">
+      {/* --- Header with Welcome and Action Buttons --- */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">
           Welcome, {user?.name}!
         </h1>
-        {/* Quick Action Buttons */}
         <div className="flex gap-4">
           <Link
             to="/student/report-issue"
@@ -83,8 +85,10 @@ const StudentDashboard = () => {
         </div>
       </div>
 
+      {/* --- Grid for the two tables --- */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* My Ticket History */}
+        
+        {/* --- My Ticket History Table --- */}
         <div className="bg-gray-800 rounded-xl shadow-lg p-6">
           <h3 className="text-xl font-semibold text-white mb-4">My Ticket History</h3>
           <div className="overflow-y-auto max-h-96">
@@ -102,8 +106,10 @@ const StudentDashboard = () => {
                 ) : (
                   myTickets.map((ticket) => (
                     <tr key={ticket.ticketId} className="text-sm text-gray-300">
-                      <td className="py-3 pr-3">{ticket.issueDescription.substring(0, 30)}...</td>
-                      <td className="py-3 pr-3"><TicketStatus status={ticket.status} /></td>
+                      <td className="py-3 pr-3 font-medium text-white">
+                        {ticket.issueDescription.substring(0, 30)}...
+                      </td>
+                      <td className="py-3 pr-3"><RequestStatus status={ticket.status} /></td>
                       <td className="py-3 pr-3">{new Date(ticket.createdAt).toLocaleDateString()}</td>
                     </tr>
                   ))
@@ -113,7 +119,7 @@ const StudentDashboard = () => {
           </div>
         </div>
 
-        {/* My Software Requests */}
+        {/* --- My Software Requests Table --- */}
         <div className="bg-gray-800 rounded-xl shadow-lg p-6">
           <h3 className="text-xl font-semibold text-white mb-4">My Software Requests</h3>
           <div className="overflow-y-auto max-h-96">
@@ -131,8 +137,10 @@ const StudentDashboard = () => {
                 ) : (
                   mySoftware.map((req) => (
                     <tr key={req.softwareRequestId} className="text-sm text-gray-300">
-                      <td className="py-3 pr-3">{req.softwareName}</td>
-                      <td className="py-3 pr-3"><TicketStatus status={req.status} /></td>
+                      <td className="py-3 pr-3 font-medium text-white">
+                        {req.softwareName}
+                      </td>
+                      <td className="py-3 pr-3"><RequestStatus status={req.status} /></td>
                       <td className="py-3 pr-3">{new Date(req.createdAt).toLocaleDateString()}</td>
                     </tr>
                   ))
