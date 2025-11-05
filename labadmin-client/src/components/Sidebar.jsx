@@ -253,12 +253,7 @@ const Sidebar = () => {
           })}
         </nav>
 
-        {/* Sidebar Footer (optional) */}
-        <div className={`p-4 border-t border-gray-700 ${!showText && 'hidden'}`}>
-          <p className="text-xs text-gray-400">
-            &copy; {new Date().getFullYear()} LabAdmin
-          </p>
-        </div>
+
       </aside>
     </>
   );

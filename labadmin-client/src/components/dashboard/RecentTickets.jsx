@@ -46,10 +46,10 @@ const RecentTickets = () => {
   }
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
+    <div className="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-semibold text-white">Recent Tickets</h3>
-        <Link to="/admin/tickets" className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400">
+        <Link to="/admin/tickets" className="text-sm font-medium text-blue-400 hover:underline">
           See all
         </Link>
       </div>

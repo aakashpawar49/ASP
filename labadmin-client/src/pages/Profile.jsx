@@ -22,7 +22,7 @@ const RoleTag = ({ role }) => {
 // --- Sub-component: Profile Details Card ---
 const ProfileDetails = ({ user }) => {
   return (
-    <div className="bg-gray-800 p-6 rounded-xl shadow-lg h-full">
+    <div className="bg-gray-900 p-6 rounded-xl shadow-lg h-full">
       <h3 className="text-xl font-semibold text-white mb-4">Profile Details</h3>
       <div className="space-y-4">
         <div>
@@ -85,7 +85,7 @@ const ChangePasswordForm = () => {
   };
 
   return (
-    <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
+    <div className="bg-gray-900 p-6 rounded-xl shadow-lg">
       <h3 className="text-xl font-semibold text-white mb-4">Change Password</h3>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>

@@ -1,0 +1,6 @@
+- [x] Remove Footer from DashboardLayout.jsx
+- [x] Remove sidebar footer from Sidebar.jsx
+- [x] Update Footer.jsx styling to match the dark theme
+- [x] Add Footer back to DashboardLayout.jsx
+- [x] Simplify Footer.jsx to center-aligned text with "MCA 2025-26 © 2025 All rights reserved."
+- [x] Add LabAdmin logo/link back to footer

@@ -39,7 +39,7 @@ const UsageReports = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Chart 1: Tickets Resolved Per Lab */}
-        <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
+        <div className="bg-gray-900 p-6 rounded-xl shadow-lg">
           <h3 className="text-xl font-semibold text-white mb-4">Tickets Resolved Per Lab</h3>
           <div style={{ width: '100%', height: '300px' }}>
             <ResponsiveContainer width="100%" height="100%">
@@ -64,7 +64,7 @@ const UsageReports = () => {
         </div>
 
         {/* Chart 2: Top 5 Software Requests */}
-        <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
+        <div className="bg-gray-900 p-6 rounded-xl shadow-lg">
           <h3 className="text-xl font-semibold text-white mb-4">Top 5 Software Requests</h3>
           <div style={{ width: '100%', height: '300px' }}>
             <ResponsiveContainer width="100%" height="100%">

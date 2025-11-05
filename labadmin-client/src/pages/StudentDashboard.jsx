@@ -89,7 +89,7 @@ const StudentDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* --- My Ticket History Table --- */}
-        <div className="bg-gray-800 rounded-xl shadow-lg p-6">
+        <div className="bg-gray-900 rounded-xl shadow-lg p-6">
           <h3 className="text-xl font-semibold text-white mb-4">My Ticket History</h3>
           <div className="overflow-y-auto max-h-96">
             <table className="w-full min-w-max text-left">
@@ -120,7 +120,7 @@ const StudentDashboard = () => {
         </div>
 
         {/* --- My Software Requests Table --- */}
-        <div className="bg-gray-800 rounded-xl shadow-lg p-6">
+        <div className="bg-gray-900 rounded-xl shadow-lg p-6">
           <h3 className="text-xl font-semibold text-white mb-4">My Software Requests</h3>
           <div className="overflow-y-auto max-h-96">
             <table className="w-full min-w-max text-left">

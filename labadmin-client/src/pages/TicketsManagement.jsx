@@ -89,7 +89,7 @@ const TicketsManagement = () => {
       </div>
 
       {/* Tickets Table */}
-      <div className="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+      <div className="bg-gray-900 rounded-xl shadow-lg overflow-hidden">
         <table className="w-full min-w-max text-left">
           <thead>
             <tr className="text-xs font-semibold text-gray-400 uppercase border-b border-gray-700">
@@ -108,7 +108,7 @@ const TicketsManagement = () => {
               <tr><td colSpan="6" className="p-4 text-center text-gray-500">No tickets found.</td></tr>
             ) : (
               tickets.map((ticket) => (
-                <tr key={ticket.ticketId} className="text-sm text-gray-300">
+                <tr key={ticket.ticketId} className="text-sm text-gray-300 hover:bg-gray-700">
                   <td className="p-4">
                     <Link to={`/admin/tickets/${ticket.ticketId}`} className="font-medium text-white hover:underline">
                       {ticket.issueDescription.substring(0, 40)}...

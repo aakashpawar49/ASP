@@ -85,7 +85,7 @@ const LabsManagement = () => {
       </div>
 
       {/* Labs Table */}
-      <div className="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+      <div className="bg-gray-900 rounded-xl shadow-lg overflow-hidden">
         <table className="w-full min-w-max text-left">
           <thead>
             <tr className="text-xs font-semibold text-gray-400 uppercase border-b border-gray-700">
@@ -102,7 +102,7 @@ const LabsManagement = () => {
               <tr><td colSpan="4" className="p-4 text-center text-gray-500">No labs found.</td></tr>
             ) : (
               labs.map((lab) => (
-                <tr key={lab.labId} className="text-sm text-gray-300">
+                <tr key={lab.labId} className="text-sm text-gray-300 hover:bg-gray-700">
                   <td className="p-4 font-medium text-white">{lab.labName}</td>
                   <td className="p-4">{lab.location}</td>
                   <td className="p-4">{lab.labInchargeName || <span className="text-gray-500">N/A</span>}</td>

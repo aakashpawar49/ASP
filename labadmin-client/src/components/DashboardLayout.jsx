@@ -9,7 +9,7 @@ const DashboardLayout = () => {
   const { isExpanded } = useSidebar();
 
   return (
-    <div className={`min-h-screen bg-gray-50 flex flex-col ${isExpanded ? 'lg:ml-64' : 'lg:ml-20'}`}>
+    <div className={`min-h-screen bg-gray-900 flex flex-col ${isExpanded ? 'lg:ml-64' : 'lg:ml-20'}`}>
       <Sidebar />
       <Topbar />
       <main className="container mx-auto px-6 py-8 grow">

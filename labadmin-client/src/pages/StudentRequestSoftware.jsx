@@ -66,7 +66,7 @@ const StudentRequestSoftware = () => {
   return (
     <div className="text-white">
       <h1 className="text-3xl font-bold mb-6">Request Software</h1>
-      <div className="bg-gray-800 p-6 rounded-xl shadow-lg max-w-2xl">
+      <div className="bg-gray-900 p-6 rounded-xl shadow-lg max-w-2xl">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="device" className="block text-sm font-medium text-gray-300 mb-2">

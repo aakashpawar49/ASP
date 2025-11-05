@@ -39,14 +39,14 @@ const OpenTicketsChart = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-gray-800 p-6 rounded-xl shadow-lg h-full flex items-center justify-center">
+      <div className="bg-gray-900 p-6 rounded-xl shadow-lg h-full flex items-center justify-center">
         <Spinner text="Loading chart..." />
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-800 p-6 rounded-xl shadow-lg h-full">
+    <div className="bg-gray-900 p-6 rounded-xl shadow-lg h-full">
       <h3 className="text-xl font-semibold text-white mb-4">Open vs Closed Tickets</h3>
       <p className="text-sm text-gray-400 mb-2">Percentage of tickets resolved this month.</p>
       

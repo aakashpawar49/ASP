@@ -36,7 +36,7 @@ const AuditTrail = () => {
       <h1 className="text-3xl font-bold mb-6">Audit Trail Report</h1>
 
       {/* Audit Log Table */}
-      <div className="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+      <div className="bg-gray-900 rounded-xl shadow-lg overflow-hidden">
         <table className="w-full min-w-max text-left">
           <thead>
             <tr className="text-xs font-semibold text-gray-400 uppercase border-b border-gray-700">

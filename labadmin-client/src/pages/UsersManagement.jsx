@@ -101,7 +101,7 @@ const UsersManagement = () => {
       </div>
 
       {/* Users Table */}
-      <div className="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+      <div className="bg-gray-900 rounded-xl shadow-lg overflow-hidden">
         <table className="w-full min-w-max text-left">
           <thead>
             <tr className="text-xs font-semibold text-gray-400 uppercase border-b border-gray-700">

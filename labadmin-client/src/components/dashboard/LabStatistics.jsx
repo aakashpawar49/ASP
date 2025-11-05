@@ -25,14 +25,14 @@ const LabStatistics = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-gray-800 p-6 rounded-xl shadow-lg h-full flex items-center justify-center">
+      <div className="bg-gray-900 p-6 rounded-xl shadow-lg h-full flex items-center justify-center">
         <Spinner text="Loading stats..." />
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-800 p-6 rounded-xl shadow-lg h-full">
+    <div className="bg-gray-900 p-6 rounded-xl shadow-lg h-full border border-gray-700">
       <h3 className="text-xl font-semibold text-white mb-4">Lab Statistics</h3>
       <p className="text-sm text-gray-400 mb-5">Ticket resolution status by lab</p>
       

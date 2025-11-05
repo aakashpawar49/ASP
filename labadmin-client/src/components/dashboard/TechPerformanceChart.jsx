@@ -40,14 +40,14 @@ const TechPerformanceChart = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-gray-800 p-6 rounded-xl shadow-lg h-full flex items-center justify-center" style={{ minHeight: '300px' }}>
+      <div className="bg-gray-900 p-6 rounded-xl shadow-lg h-full flex items-center justify-center" style={{ minHeight: '300px' }}>
         <Spinner text="Loading chart..." />
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-800 p-6 rounded-xl shadow-lg h-full">
+    <div className="bg-gray-900 p-6 rounded-xl shadow-lg h-full border border-gray-700">
       <h3 className="text-xl font-semibold text-white mb-4">Technician Performance</h3>
       <p className="text-sm text-gray-400 mb-4">Monthly tickets resolved by technicians</p>
       
