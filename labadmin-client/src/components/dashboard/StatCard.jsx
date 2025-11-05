@@ -16,7 +16,7 @@ const StatCard = ({ title, value, change, icon }) => {
   const changeColor = isIncrease ? 'text-green-500' : 'text-red-500';
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
+    <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 dark:bg-gray-800 dark:border-gray-700 transition-all duration-200 hover:scale-[1.02]">
       <div className="flex justify-between items-start">
         <div className="flex flex-col">
           <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</span>

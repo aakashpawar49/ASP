@@ -118,7 +118,7 @@ const UsersManagement = () => {
               <tr><td colSpan="4" className="p-4 text-center text-gray-500">No users found.</td></tr>
             ) : (
               users.map((user) => (
-                <tr key={user.userId} className="text-sm text-gray-300">
+                <tr key={user.userId} className="text-sm text-gray-300 hover:bg-gray-700">
                   <td className="p-4 font-medium text-white">{user.name}</td>
                   <td className="p-4">{user.email}</td>
                   <td className="p-4"><RoleTag role={user.role} /></td>

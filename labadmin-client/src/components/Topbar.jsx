@@ -25,7 +25,7 @@ const getDashboardPath = (user) => {
 
 // Simple notification bell
 const NotificationDropdown = () => (
-  <button className="flex items-center justify-center w-10 h-10 text-gray-500 rounded-lg hover:bg-gray-100">
+  <button className="flex items-center justify-center w-10 h-10 text-gray-400 rounded-lg hover:bg-gray-700">
     <Bell size={20} />
   </button>
 );
@@ -38,9 +38,9 @@ const UserDropdown = () => {
     // 'relative' and 'group' are for the hover dropdown
     <div className="relative group">
       {/* This is the always-visible part (the trigger) */}
-      <button className="flex items-center gap-2 rounded-lg p-2 transition-colors hover:bg-gray-100">
+      <button className="flex items-center gap-2 rounded-lg p-2 transition-colors hover:bg-gray-700">
         <UserIcon size={28} className="p-1 rounded-full text-gray-600 bg-gray-100" />
-        <span className="hidden sm:block text-sm font-medium text-gray-800">{user?.name || 'User'}</span>
+        <span className="hidden sm:block text-sm font-medium text-white">{user?.name || 'User'}</span>
       </button>
 
       {/* This is the hover-activated "Profile Card" */}
@@ -113,8 +113,8 @@ const Topbar = () => {
 
   return (
     // 'sticky top-0' makes it stick to the top
-    // Clean, white background with a bottom border
-    <header className="sticky top-0 flex w-full bg-white border-b border-gray-200 z-40">
+    // Clean, dark background with a bottom border
+    <header className="sticky top-0 flex w-full bg-gray-900 border-b border-gray-700 z-40">
       <div className="flex items-center grow px-4 sm:px-6 h-16">
 
         {/* Left Section (Toggle) */}
@@ -122,7 +122,7 @@ const Topbar = () => {
           {/* === Sidebar Toggle Button (Hamburger) === */}
           <button
             type="button"
-            className="flex items-center justify-center w-10 h-10 text-gray-500 rounded-lg hover:bg-gray-100 lg:border lg:w-11 lg:h-11"
+            className="flex items-center justify-center w-10 h-10 text-gray-400 rounded-lg hover:bg-gray-700 lg:border lg:w-11 lg:h-11"
             onClick={handleToggle}
             aria-label="Toggle Sidebar"
           >
@@ -132,7 +132,7 @@ const Topbar = () => {
 
         {/* Center Section (Logo) */}
         <div className="flex-1 flex justify-center">
-          <Link to={getDashboardPath(user)} className="font-bold text-xl text-gray-800">
+          <Link to={getDashboardPath(user)} className="font-bold text-xl text-white">
             LabAdmin
           </Link>
         </div>

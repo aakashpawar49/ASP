@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
-    <footer className="bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 border-t border-gray-200 mt-auto">
-      <div className="container mx-auto px-6 py-8">
+    <footer className="bg-gray-50 border-t border-gray-200 mt-auto">
+      <div className="px-6 py-8">
         <div className="flex flex-col md:flex-row justify-between items-center">
           
           {/* Logo & Copyright */}

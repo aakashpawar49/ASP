@@ -32,8 +32,8 @@ const SidebarLink = ({ to, icon: Icon, children, isExpanded }) => {
       className={`flex items-center p-3 rounded-lg transition-colors
         ${isExpanded ? 'w-full' : 'w-12 justify-center'}
         ${isActive
-          ? 'bg-blue-100 text-blue-600 font-medium'
-          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+          ? 'bg-blue-600 text-white font-medium'
+          : 'text-gray-400 hover:text-white hover:bg-gray-700'
         }`}
       title={isExpanded ? '' : children}
     >
@@ -67,8 +67,8 @@ const SidebarDropdown = ({ title, icon: Icon, children, isExpanded }) => {
         className={`flex items-center p-3 rounded-lg transition-colors w-full
           ${isExpanded ? 'justify-between' : 'w-12 justify-center'}
           ${isActive
-            ? 'text-blue-600 font-medium'
-            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+            ? 'text-white font-medium'
+            : 'text-gray-400 hover:text-white hover:bg-gray-700'
           }`}
         title={isExpanded ? '' : title}
       >
@@ -86,7 +86,7 @@ const SidebarDropdown = ({ title, icon: Icon, children, isExpanded }) => {
       
       {/* Dropdown Content */}
       {isExpanded && isOpen && (
-        <div className="mt-1 ml-6 pl-3 border-l border-gray-200 space-y-1">
+        <div className="mt-1 ml-6 pl-3 border-l border-gray-700 space-y-1">
           {children}
         </div>
       )}
@@ -103,8 +103,8 @@ const DropdownLink = ({ to, children }) => {
       to={to}
       className={`block w-full text-left px-3 py-2 text-sm rounded-md
         ${isActive
-          ? 'text-blue-600 font-medium'
-          : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100'
+          ? 'text-white font-medium'
+          : 'text-gray-400 hover:text-white hover:bg-gray-700'
         }`}
     >
       {children}
@@ -211,8 +211,8 @@ const Sidebar = () => {
       )}
 
       {/* Main Sidebar */}
-      <aside 
-        className={`fixed top-0 left-0 h-screen bg-white border-r border-gray-200 z-50
+      <aside
+        className={`fixed top-0 left-0 h-screen bg-gray-900 border-r border-gray-700 z-50
                    flex flex-col transition-all duration-300 ease-in-out
                    ${isMobileOpen ? 'translate-x-0 w-64' : '-translate-x-full'}
                    ${isExpanded ? 'w-64' : 'w-20'}
@@ -222,11 +222,11 @@ const Sidebar = () => {
         onMouseLeave={() => !isMobileOpen && setIsHovered(false)}
       >
         {/* Logo/Title */}
-        <div className={`flex items-center h-16 px-6 border-b border-gray-200 ${!showText && 'justify-center'}`}>
+        <div className={`flex items-center h-16 px-6 border-b border-gray-700 ${!showText && 'justify-center'}`}>
           <Link to={getDashboardPath()} className="flex items-center gap-2">
             {/* Simple Logo Icon */}
             <div className="w-8 h-8 bg-linear-to-r from-blue-500 to-indigo-600 rounded-lg shrink-0" />
-            {showText && <span className="font-bold text-xl text-gray-800">LabAdmin</span>}
+            {showText && <span className="font-bold text-xl text-white">LabAdmin</span>}
           </Link>
         </div>
 
@@ -254,8 +254,8 @@ const Sidebar = () => {
         </nav>
 
         {/* Sidebar Footer (optional) */}
-        <div className={`p-4 border-t border-gray-200 ${!showText && 'hidden'}`}>
-          <p className="text-xs text-gray-500">
+        <div className={`p-4 border-t border-gray-700 ${!showText && 'hidden'}`}>
+          <p className="text-xs text-gray-400">
             &copy; {new Date().getFullYear()} LabAdmin
           </p>
         </div>

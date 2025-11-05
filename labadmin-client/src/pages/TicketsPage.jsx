@@ -107,7 +107,7 @@ const TicketsPage = () => {
               <tr><td colSpan="6" className="p-4 text-center text-gray-500">No tickets found.</td></tr>
             ) : (
               tickets.map((ticket) => (
-                <tr key={ticket.ticketId} className="text-sm text-gray-300">
+                <tr key={ticket.ticketId} className="text-sm text-gray-300 hover:bg-gray-700">
                   <td className="p-4">
                     <div className="font-medium text-white">{ticket.issueDescription.substring(0, 40)}...</div>
                     <div className="text-xs text-gray-500">{new Date(ticket.createdAt).toLocaleString()}</div>
