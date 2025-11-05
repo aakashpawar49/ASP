@@ -3,7 +3,6 @@ import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useSidebar } from '../context/SidebarContext';
 
-// Import all the icons we'll need for your 10-point list
 import {
   LayoutDashboard,
   HardDrive,
@@ -18,14 +17,14 @@ import {
   BarChart3,
   Archive,
   BookUser,
-  PieChart,
-  Menu
+  PieChart
 } from 'lucide-react';
 
 // --- Reusable Link Component ---
 const SidebarLink = ({ to, icon: Icon, children, isExpanded }) => {
   const location = useLocation();
-  const isActive = location.pathname === to;
+  // Now also check if the path starts with the 'to' link, for nested routes
+  const isActive = location.pathname === to || (to !== '/' && location.pathname.startsWith(to));
 
   return (
     <NavLink
@@ -51,7 +50,7 @@ const SidebarDropdown = ({ title, icon: Icon, children, isExpanded }) => {
 
   // Check if any child link is active
   const isActive = React.Children.toArray(children).some(
-    (child) => child.props.to === location.pathname
+    (child) => child.props.to === location.pathname || location.pathname.startsWith(child.props.to)
   );
 
   // Open dropdown if a child is active
@@ -116,7 +115,7 @@ const DropdownLink = ({ to, children }) => {
 
 // --- Main Sidebar Component ---
 const Sidebar = () => {
-  const { isExpanded, isMobileOpen } = useSidebar();
+  const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const { user } = useAuth();
 
   // This function builds the navigation menu based on user role
@@ -131,10 +130,10 @@ const Sidebar = () => {
       // --- ADMINS see all 10 items ---
       case 'Admin':
         return [
-          { type: 'dropdown', title: 'Dashboard', icon: LayoutDashboard, children: [
-            { to: '/admin/dashboard/overview', title: 'Overview' },
-            { to: '/admin/dashboard/analytics', title: 'Analytics' },
-          ]},
+          // --- THIS IS THE CHANGE ---
+          { type: 'link', to: '/admin/dashboard', icon: LayoutDashboard, title: 'Dashboard' },
+          // --- END OF CHANGE ---
+
           { type: 'link', to: '/admin/labs', icon: FlaskConical, title: 'Labs Management' },
           { type: 'link', to: '/admin/systems', icon: HardDrive, title: 'Systems / Machines' },
           { type: 'link', to: '/admin/users', icon: Users, title: 'Users Management' },
@@ -164,6 +163,7 @@ const Sidebar = () => {
           { type: 'link', to: '/teacher/dashboard', icon: LayoutDashboard, title: 'My Dashboard' },
           { type: 'link', to: '/teacher/request-software', icon: Package, title: 'Request Software' },
           { type: 'link', to: '/teacher/report-issue', icon: Ticket, title: 'Report an Issue' },
+          { type: 'link', to: '/teacher/schedule', icon: Calendar, title: 'Book a Lab' },
           ...baseNav
         ];
       
@@ -184,32 +184,32 @@ const Sidebar = () => {
 
   const navItems = getNavItems();
   // We use 'isExpanded' for desktop and 'isMobileOpen' for mobile
-  const showText = isExpanded || isMobileOpen;
+  const showText = isExpanded || isMobileOpen || isHovered;
 
   return (
     <>
       {/* Mobile overlay - shown when mobile menu is open */}
       {isMobileOpen && (
-        <div className="fixed inset-0 bg-black opacity-30 z-40 lg:hidden" />
+        <div onClick={() => setIsHovered(false)} className="fixed inset-0 bg-black opacity-30 z-40 lg:hidden" />
       )}
 
       {/* Main Sidebar */}
       <aside 
         className={`fixed top-0 left-0 h-screen bg-white border-r border-gray-200 z-50
                    flex flex-col transition-all duration-300 ease-in-out
-                   ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
+                   ${isMobileOpen ? 'translate-x-0 w-64' : '-translate-x-full'}
                    ${isExpanded ? 'w-64' : 'w-20'}
-                   lg:translate-x-0`} // On desktop, always show it (toggle handled by margin)
+                   ${isHovered && !isExpanded && !isMobileOpen ? 'w-64 shadow-lg' : ''}
+                   lg:translate-x-0`} // On desktop, always show it
+        onMouseEnter={() => !isMobileOpen && setIsHovered(true)}
+        onMouseLeave={() => !isMobileOpen && setIsHovered(false)}
       >
         {/* Logo/Title */}
-        <div className={`flex items-center h-16 px-6 border-b border-gray-200 ${!isExpanded && 'justify-center'}`}>
+        <div className={`flex items-center h-16 px-6 border-b border-gray-200 ${!showText && 'justify-center'}`}>
           <Link to="/" className="flex items-center gap-2">
             {/* Simple Logo Icon */}
-            {showText ? (
-              <span className="font-bold text-xl text-gray-800">LabAdmin</span>
-            ) : (
-              <Menu className="w-5 h-5 text-gray-600" />
-            )}
+            <div className="w-8 h-8 bg-linear-to-r from-blue-500 to-indigo-600 rounded-lg flex-shrink-0" />
+            {showText && <span className="font-bold text-xl text-gray-800">LabAdmin</span>}
           </Link>
         </div>
 
