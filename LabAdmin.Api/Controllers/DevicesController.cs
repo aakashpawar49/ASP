@@ -181,5 +181,28 @@ namespace LabAdmin.Api.Controllers
 
             return NoContent(); // Standard response for a successful DELETE
         }
+
+        // Add this new method INSIDE your DevicesController class
+        // This is a new "read-only" endpoint for all authenticated users
+        // GET: api/devices/list
+        [HttpGet("list")]
+        [Authorize] // Any logged-in user can get this list
+        public async Task<ActionResult<IEnumerable<DeviceDto>>> GetDeviceList()
+        {
+            var devices = await _context.Devices
+                .Include(d => d.Lab)
+                .OrderBy(d => d.Lab.LabName)
+                .ThenBy(d => d.DeviceName)
+                .Select(d => new DeviceDto
+                {
+                    DeviceId = d.DeviceId,
+                    DeviceName = d.DeviceName,
+                    LabId = d.LabId,
+                    LabName = d.Lab.LabName
+                })
+                .ToListAsync();
+            
+            return Ok(devices);
+        }
     }
 }
