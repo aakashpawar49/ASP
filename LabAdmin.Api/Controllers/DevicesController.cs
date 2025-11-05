@@ -10,7 +10,7 @@ namespace LabAdmin.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")] // Only Admins can manage devices
+    [Authorize] // 1. Authorizes ANY logged-in user for the whole class
     public class DevicesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -21,12 +21,12 @@ namespace LabAdmin.Api.Controllers
         }
 
         // GET: api/devices
-        // Gets all devices, with an optional filter by lab
         [HttpGet]
+        [Authorize(Roles = "Admin")] // 2. Specific Admin-only rule for this method
         public async Task<ActionResult<IEnumerable<DeviceDto>>> GetDevices([FromQuery] int? labId)
         {
             var query = _context.Devices
-                .Include(d => d.Lab) // Include Lab data
+                .Include(d => d.Lab)
                 .OrderBy(d => d.DeviceName)
                 .AsQueryable();
 
@@ -45,16 +45,37 @@ namespace LabAdmin.Api.Controllers
                 SerialNumber = d.SerialNumber,
                 Status = d.Status,
                 LabId = d.LabId,
-                LabName = d.Lab.LabName // Get name from included Lab
+                LabName = d.Lab.LabName
             })
                 .ToListAsync();
 
             return Ok(devices);
         }
 
+        // GET: api/devices/list
+        [HttpGet("list")]
+        [Authorize] // 3. This inherits the class-level [Authorize], so ANY logged-in user (Admin, Student, etc.) can access it.
+        public async Task<ActionResult<IEnumerable<DeviceDto>>> GetDeviceList()
+        {
+            var devices = await _context.Devices
+                .Include(d => d.Lab)
+                .OrderBy(d => d.Lab.LabName)
+                .ThenBy(d => d.DeviceName)
+                .Select(d => new DeviceDto
+                {
+                    DeviceId = d.DeviceId,
+                    DeviceName = d.DeviceName,
+                    LabId = d.LabId,
+                    LabName = d.Lab.LabName
+                })
+                .ToListAsync();
+            
+            return Ok(devices);
+        }
+
         // GET: api/devices/{id}
-        // Gets a single device by ID
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin")] // Admin-only
         public async Task<ActionResult<DeviceDto>> GetDevice(int id)
         {
             var device = await _context.Devices
@@ -82,17 +103,15 @@ namespace LabAdmin.Api.Controllers
         }
 
         // POST: api/devices
-        // Creates a new device
         [HttpPost]
+        [Authorize(Roles = "Admin")] // Admin-only
         public async Task<ActionResult<DeviceDto>> CreateDevice(DeviceCreateUpdateDto deviceDto)
         {
-            // Check for duplicate serial number
             if (await _context.Devices.AnyAsync(d => d.SerialNumber == deviceDto.SerialNumber))
             {
                 return BadRequest("A device with this serial number already exists.");
             }
 
-            // Check if LabId is valid
             if (!await _context.Labs.AnyAsync(l => l.LabId == deviceDto.LabId))
             {
                 return BadRequest("Invalid Lab ID.");
@@ -112,15 +131,28 @@ namespace LabAdmin.Api.Controllers
             _context.Devices.Add(device);
             await _context.SaveChangesAsync();
 
-            // We reload the device to get the Lab Name for the return DTO
-            var newDeviceDto = (await GetDevice(device.DeviceId)).Value;
+            // Reload the device to get the Lab Name for the DTO
+            var newDeviceDto = (await _context.Devices.Include(d => d.Lab)
+                .Select(d => new DeviceDto
+                {
+                    DeviceId = d.DeviceId,
+                    DeviceName = d.DeviceName,
+                    DeviceType = d.DeviceType,
+                    Brand = d.Brand,
+                    Model = d.Model,
+                    SerialNumber = d.SerialNumber,
+                    Status = d.Status,
+                    LabId = d.LabId,
+                    LabName = d.Lab.LabName
+                })
+                .FirstOrDefaultAsync(d => d.DeviceId == device.DeviceId));
 
             return CreatedAtAction(nameof(GetDevice), new { id = device.DeviceId }, newDeviceDto);
         }
 
         // PUT: api/devices/{id}
-        // Updates an existing device
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")] // Admin-only
         public async Task<IActionResult> UpdateDevice(int id, DeviceCreateUpdateDto deviceDto)
         {
             var device = await _context.Devices.FindAsync(id);
@@ -129,20 +161,17 @@ namespace LabAdmin.Api.Controllers
                 return NotFound();
             }
 
-            // Check if serial number is being changed to one that already exists
             if (device.SerialNumber != deviceDto.SerialNumber &&
                 await _context.Devices.AnyAsync(d => d.SerialNumber == deviceDto.SerialNumber))
             {
                 return BadRequest("A device with this serial number already exists.");
             }
 
-            // Check if LabId is valid
             if (!await _context.Labs.AnyAsync(l => l.LabId == deviceDto.LabId))
             {
                 return BadRequest("Invalid Lab ID.");
             }
 
-            // Map properties
             device.DeviceName = deviceDto.DeviceName;
             device.DeviceType = deviceDto.DeviceType;
             device.Brand = deviceDto.Brand;
@@ -154,12 +183,12 @@ namespace LabAdmin.Api.Controllers
             _context.Entry(device).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
-            return NoContent(); // Standard response for a successful PUT
+            return NoContent();
         }
 
         // DELETE: api/devices/{id}
-        // Deletes a device
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")] // Admin-only
         public async Task<IActionResult> DeleteDevice(int id)
         {
             var device = await _context.Devices.FindAsync(id);
@@ -168,7 +197,6 @@ namespace LabAdmin.Api.Controllers
                 return NotFound();
             }
 
-            // CRITICAL: Check for dependencies. Can't delete a device if it has tickets.
             var hasTickets = await _context.Tickets.AnyAsync(t => t.DeviceId == id);
             var hasSoftwareRequests = await _context.SoftwareRequests.AnyAsync(sr => sr.DeviceId == id);
             if (hasTickets || hasSoftwareRequests)
@@ -179,30 +207,7 @@ namespace LabAdmin.Api.Controllers
             _context.Devices.Remove(device);
             await _context.SaveChangesAsync();
 
-            return NoContent(); // Standard response for a successful DELETE
-        }
-
-        // Add this new method INSIDE your DevicesController class
-        // This is a new "read-only" endpoint for all authenticated users
-        // GET: api/devices/list
-        [HttpGet("list")]
-        [Authorize] // Any logged-in user can get this list
-        public async Task<ActionResult<IEnumerable<DeviceDto>>> GetDeviceList()
-        {
-            var devices = await _context.Devices
-                .Include(d => d.Lab)
-                .OrderBy(d => d.Lab.LabName)
-                .ThenBy(d => d.DeviceName)
-                .Select(d => new DeviceDto
-                {
-                    DeviceId = d.DeviceId,
-                    DeviceName = d.DeviceName,
-                    LabId = d.LabId,
-                    LabName = d.Lab.LabName
-                })
-                .ToListAsync();
-            
-            return Ok(devices);
+            return NoContent();
         }
     }
 }

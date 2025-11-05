@@ -17,6 +17,7 @@ const StudentReportIssue = () => {
   useEffect(() => {
     const fetchDevices = async () => {
       try {
+        // This is the endpoint we just fixed
         const response = await api.get('/devices/list');
         setDevices(response.data);
       } catch (error) {
@@ -56,7 +57,9 @@ const StudentReportIssue = () => {
     return (
       <div className="text-white">
         <h1 className="text-3xl font-bold mb-6">Report an Issue</h1>
-        <Spinner text="Loading devices..." />
+        <div className="bg-gray-800 p-6 rounded-xl shadow-lg max-w-2xl">
+          <Spinner text="Loading devices..." />
+        </div>
       </div>
     );
   }
