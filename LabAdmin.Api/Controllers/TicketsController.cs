@@ -1,15 +1,16 @@
 using LabAdmin.Api.Data;
-using LabAdmin.Api.Dtos; // <-- Added Dtos
+using LabAdmin.Api.Dtos; 
 using LabAdmin.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims; // <-- 1. IMPORT THIS
 
 namespace LabAdmin.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // All endpoints in this controller are protected
+    [Authorize]
     public class TicketsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -19,48 +20,62 @@ namespace LabAdmin.Api.Controllers
             _context = context;
         }
 
-        // --- NEW ENDPOINT 1: Get All Tickets (with filter) ---
         // GET: api/tickets
+        // Admins/Techs can see all tickets
         [HttpGet]
         [Authorize(Roles = "Admin,LabTech")]
         public async Task<ActionResult<IEnumerable<Ticket>>> GetTickets([FromQuery] string? status)
         {
-            // Start with a queryable object
             var query = _context.Tickets
-                .Include(t => t.Requester)  // Gets the User
-                .Include(t => t.Technician) // Gets the Assigned User
-                .Include(t => t.Device)     // Gets the Device
-                .ThenInclude(d => d.Lab) // Gets the Lab *from* the Device
+                .Include(t => t.Requester)
+                .Include(t => t.Device)
+                .ThenInclude(d => d.Lab)
                 .AsQueryable();
 
-            // If a status is provided, filter by it
             if (!string.IsNullOrEmpty(status))
             {
                 query = query.Where(t => t.Status == status);
             }
 
-            // Get the final list
             var tickets = await query
                 .OrderByDescending(t => t.CreatedAt)
                 .ToListAsync();
 
-            // Clean password hashes before sending
             foreach (var ticket in tickets)
             {
-                if (ticket.Requester != null)
-                {
-                    ticket.Requester.PasswordHash = null;
-                }
-                if (ticket.Technician != null)
-                {
-                    ticket.Technician.PasswordHash = null;
-                }
+                if (ticket.Requester != null) ticket.Requester.PasswordHash = null;
+                if (ticket.Technician != null) ticket.Technician.PasswordHash = null;
             }
 
             return Ok(tickets);
         }
 
-        // --- EXISTING ENDPOINT ---
+        // --- NEW ENDPOINT 1: Get MY Tickets ---
+        // GET: api/tickets/my-requests
+        [HttpGet("my-requests")]
+        [Authorize(Roles = "Student,Teacher,Admin")] // Students/Teachers can see their own
+        public async Task<ActionResult<IEnumerable<Ticket>>> GetMyRequests()
+        {
+            // Get the logged-in user's ID from their token
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var myTickets = await _context.Tickets
+                .Where(t => t.RequestedBy == userId) // Filter by logged-in user
+                .Include(t => t.Device)
+                .ThenInclude(d => d.Lab)
+                .Include(t => t.Technician) // See who it's assigned to
+                .OrderByDescending(t => t.CreatedAt)
+                .ToListAsync();
+
+            foreach (var ticket in myTickets)
+            {
+                // Clean hash from technician object
+                if (ticket.Technician != null) ticket.Technician.PasswordHash = null;
+            }
+
+            return Ok(myTickets);
+        }
+
         // GET: api/tickets/recent
         [HttpGet("recent")]
         [Authorize(Roles = "Admin,LabTech")]
@@ -69,11 +84,10 @@ namespace LabAdmin.Api.Controllers
             var recentTickets = await _context.Tickets
                 .Include(t => t.Requester)
                 .Include(t => t.Device)
-                .ThenInclude(d => d.Lab) // Also include Lab info
+                .ThenInclude(d => d.Lab)
                 .OrderByDescending(t => t.CreatedAt)
                 .Take(10)
                 .ToListAsync();
-
             foreach (var ticket in recentTickets)
             {
                 if (ticket.Requester != null)
@@ -81,41 +95,61 @@ namespace LabAdmin.Api.Controllers
                     ticket.Requester.PasswordHash = null;
                 }
             }
-
             return Ok(recentTickets);
         }
 
-        // --- NEW ENDPOINT 2: Assign a Ticket ---
-        // PUT: api/tickets/5/assign
+        // --- NEW ENDPOINT 2: Create a Ticket ---
+        // POST: api/tickets
+        [HttpPost]
+        [Authorize(Roles = "Student,Teacher,Admin")] // Students/Teachers can create
+        public async Task<ActionResult<Ticket>> CreateTicket(TicketCreateDto ticketDto)
+        {
+            // Get the logged-in user's ID from their token
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            // Check if the device exists
+            if (!await _context.Devices.AnyAsync(d => d.DeviceId == ticketDto.DeviceId))
+            {
+                return BadRequest("Invalid Device ID.");
+            }
+
+            var ticket = new Ticket
+            {
+                DeviceId = ticketDto.DeviceId,
+                IssueDescription = ticketDto.IssueDescription,
+                RequestedBy = userId, // Set from token
+                Status = "Pending",   // Default status
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+
+            _context.Tickets.Add(ticket);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetTickets), new { id = ticket.TicketId }, ticket);
+        }
+
+
+        // PUT: api/tickets/{id}/assign
         [HttpPut("{id}/assign")]
-        [Authorize(Roles = "Admin")] // Only Admins can assign tickets
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AssignTicket(int id, AssignTicketDto assignDto)
         {
-            // 1. Find the ticket
             var ticket = await _context.Tickets.FindAsync(id);
             if (ticket == null)
             {
                 return NotFound("Ticket not found.");
             }
-
-            // 2. Find the technician
             var technician = await _context.Users
                 .FirstOrDefaultAsync(u => u.UserId == assignDto.TechnicianId && u.Role == "LabTech");
-
             if (technician == null)
             {
                 return BadRequest("Invalid Technician ID.");
             }
-
-            // 3. Update the ticket
             ticket.AssignedTo = assignDto.TechnicianId;
             ticket.Status = "Assigned";
-            ticket.UpdatedAt = DateTime.Now; // Update the timestamp
-
-            // 4. Save changes
+            ticket.UpdatedAt = DateTime.Now;
             await _context.SaveChangesAsync();
-
-            // Return the updated ticket
             return Ok(ticket);
         }
     }
