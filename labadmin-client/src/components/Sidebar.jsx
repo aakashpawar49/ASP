@@ -180,7 +180,7 @@ const Sidebar = () => {
           { type: 'link', to: '/teacher/dashboard', icon: LayoutDashboard, title: 'My Dashboard' },
           { type: 'link', to: '/teacher/request-software', icon: Package, title: 'Request Software' },
           { type: 'link', to: '/teacher/report-issue', icon: Ticket, title: 'Report an Issue' },
-          { type: 'link', to: '/teacher/schedule', icon: Calendar, title: 'Book a Lab' },
+          { type: 'link', to: '/teacher/book-a-lab', icon: Calendar, title: 'Book a Lab' },
           ...baseNav
         ];
       

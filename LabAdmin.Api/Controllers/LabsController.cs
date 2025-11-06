@@ -10,7 +10,7 @@ namespace LabAdmin.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")] // Only Admins can manage labs
+    [Authorize] // 1. CHANGED: Now authorizes ANY logged-in user
     public class LabsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -21,12 +21,12 @@ namespace LabAdmin.Api.Controllers
         }
 
         // GET: api/labs
-        // Gets all labs
         [HttpGet]
+        [Authorize(Roles = "Admin")] // 2. ADDED: Admin-only for this
         public async Task<ActionResult<IEnumerable<LabDto>>> GetLabs()
         {
             var labs = await _context.Labs
-                .Include(l => l.LabIncharge) // Include the User navigation property
+                .Include(l => l.LabIncharge)
                 .OrderBy(l => l.LabName)
                 .Select(l => new LabDto
                 {
@@ -34,7 +34,6 @@ namespace LabAdmin.Api.Controllers
                     LabName = l.LabName,
                     Location = l.Location,
                     LabInchargeId = l.LabInchargeId,
-                    // Get the name from the included User object
                     LabInchargeName = l.LabIncharge.Name
                 })
                 .ToListAsync();
@@ -42,9 +41,28 @@ namespace LabAdmin.Api.Controllers
             return Ok(labs);
         }
 
+        // --- NEW PUBLIC ENDPOINT ---
+        // GET: api/labs/list
+        [HttpGet("list")]
+        [Authorize] // 3. This is public for any logged-in user
+        public async Task<ActionResult<IEnumerable<LabDto>>> GetLabList()
+        {
+            var labs = await _context.Labs
+                .OrderBy(l => l.LabName)
+                .Select(l => new LabDto
+                {
+                    LabId = l.LabId,
+                    LabName = l.LabName,
+                    Location = l.Location
+                })
+                .ToListAsync();
+
+            return Ok(labs);
+        }
+
         // GET: api/labs/{id}
-        // Gets a single lab by ID
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin")] // 4. ADDED: Admin-only
         public async Task<ActionResult<LabDto>> GetLab(int id)
         {
             var lab = await _context.Labs
@@ -68,8 +86,8 @@ namespace LabAdmin.Api.Controllers
         }
 
         // POST: api/labs
-        // Creates a new lab
         [HttpPost]
+        [Authorize(Roles = "Admin")] // 5. ADDED: Admin-only
         public async Task<ActionResult<LabDto>> CreateLab(LabCreateUpdateDto labDto)
         {
             var lab = new Lab
@@ -78,21 +96,16 @@ namespace LabAdmin.Api.Controllers
                 Location = labDto.Location,
                 LabInchargeId = labDto.LabInchargeId
             };
-
-            // TODO: Verify LabInchargeId belongs to a valid Admin or Teacher
-
             _context.Labs.Add(lab);
             await _context.SaveChangesAsync();
 
-            // We reload the lab to get the Incharge's Name for the return DTO
-            var newLabDto = await GetLab(lab.LabId);
-
-            return CreatedAtAction(nameof(GetLab), new { id = lab.LabId }, newLabDto.Value);
+            var newLabDto = (await GetLab(lab.LabId)).Value;
+            return CreatedAtAction(nameof(GetLab), new { id = lab.LabId }, newLabDto);
         }
 
         // PUT: api/labs/{id}
-        // Updates an existing lab
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")] // 6. ADDED: Admin-only
         public async Task<IActionResult> UpdateLab(int id, LabCreateUpdateDto labDto)
         {
             var lab = await _context.Labs.FindAsync(id);
@@ -100,21 +113,17 @@ namespace LabAdmin.Api.Controllers
             {
                 return NotFound();
             }
-
             lab.LabName = labDto.LabName;
             lab.Location = labDto.Location;
             lab.LabInchargeId = labDto.LabInchargeId;
-            // TODO: Verify LabInchargeId is valid
-
             _context.Entry(lab).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-
-            return NoContent(); // Standard response for a successful PUT
+            return NoContent();
         }
 
         // DELETE: api/labs/{id}
-        // Deletes a lab
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")] // 7. ADDED: Admin-only
         public async Task<IActionResult> DeleteLab(int id)
         {
             var lab = await _context.Labs.FindAsync(id);
@@ -122,18 +131,14 @@ namespace LabAdmin.Api.Controllers
             {
                 return NotFound();
             }
-
-            // Check if any devices are still assigned to this lab
             var devicesInLab = await _context.Devices.AnyAsync(d => d.LabId == id);
             if (devicesInLab)
             {
                 return BadRequest("Cannot delete lab. Reassign all devices from this lab first.");
             }
-
             _context.Labs.Remove(lab);
             await _context.SaveChangesAsync();
-
-            return NoContent(); // Standard response for a successful DELETE
+            return NoContent();
         }
     }
 }

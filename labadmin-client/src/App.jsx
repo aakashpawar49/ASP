@@ -33,6 +33,7 @@ import NotificationsSettings from './pages/NotificationsSettings';
 import LabTechTickets from './pages/LabTechTickets';
 import TeacherRequestSoftware from './pages/TeacherRequestSoftware';
 import TeacherReportIssue from './pages/TeacherReportIssue';
+import TeacherSchedule from './pages/TeacherSchedule';
 import StudentRequestSoftware from './pages/StudentRequestSoftware';
 import StudentReportIssue from './pages/StudentReportIssue';
 import Profile from './pages/Profile';
@@ -76,6 +77,7 @@ function App() {
           <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
           <Route path="/teacher/request-software" element={<TeacherRequestSoftware />} />
           <Route path="/teacher/report-issue" element={<TeacherReportIssue />} />
+          <Route path="/teacher/book-a-lab" element={<TeacherSchedule />} />
 
           {/* Student Routes */}
           <Route path="/student/dashboard" element={<StudentDashboard />} />
