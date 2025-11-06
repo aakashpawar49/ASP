@@ -1,13 +1,6 @@
-import React from 'react';
+// We are re-using the *exact* same component from the student flow.
+// This is efficient and avoids code duplication.
+import StudentReportIssue from './StudentReportIssue';
 
-const TeacherReportIssue = () => {
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Report an Issue</h1>
-      <p className="text-gray-600">This is the teacher report issue page. Placeholder content for submitting support tickets and reporting problems.</p>
-      {/* Add more content as needed */}
-    </div>
-  );
-};
-
-export default TeacherReportIssue;
+// Just export the same component under a new name for the router
+export default StudentReportIssue;

@@ -11,7 +11,7 @@ import { X } from 'lucide-react';
  * @param {function} props.onSuccess - Function to call when update is successful.
  */
 const UpdateTicketModal = ({ ticket, onClose, onSuccess }) => {
-  // A LabTech can only set these two statuses
+  // A LabTech can set these two statuses
   const [newStatus, setNewStatus] = useState('InProgress');
   const [actionTaken, setActionTaken] = useState('');
   const [remarks, setRemarks] = useState('');

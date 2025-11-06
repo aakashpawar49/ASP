@@ -3,7 +3,8 @@ import { toast } from 'react-hot-toast';
 import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import Spinner from '../components/Spinner';
-import { Send } from 'lucide-react';
+import { Send, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const StudentRequestSoftware = () => {
   const [devices, setDevices] = useState([]);
@@ -54,75 +55,84 @@ const StudentRequestSoftware = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="text-white">
-        <h1 className="text-3xl font-bold mb-6">Request Software</h1>
-        <Spinner text="Loading devices..." />
-      </div>
-    );
-  }
-
   return (
     <div className="text-white">
+      {/* --- Back to Dashboard Link --- */}
+      <div className="mb-6">
+        <Link to="/student/dashboard" className="flex items-center text-sm text-blue-400 hover:text-blue-300">
+          <ArrowLeft size={16} className="mr-1" />
+          Back to Dashboard
+        </Link>
+      </div>
+      
       <h1 className="text-3xl font-bold mb-6">Request Software</h1>
-      <div className="bg-gray-900 p-6 rounded-xl shadow-lg max-w-2xl">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="device" className="block text-sm font-medium text-gray-300 mb-2">
-              Which system do you need the software on? *
-            </label>
-            <select
-              id="device"
-              value={selectedDevice}
-              onChange={(e) => setSelectedDevice(e.target.value)}
-              className="w-full bg-gray-700 border-gray-600 text-white rounded-md p-2"
-            >
-              <option value="">Select a device...</option>
-              {devices.map((device) => (
-                <option key={device.deviceId} value={device.deviceId}>
-                  {device.labName} - {device.deviceName}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="softwareName" className="block text-sm font-medium text-gray-300 mb-2">
-              Software Name *
-            </label>
-            <input
-              type="text"
-              id="softwareName"
-              value={softwareName}
-              onChange={(e) => setSoftwareName(e.target.value)}
-              placeholder="e.g., Python 3.12"
-              className="w-full bg-gray-700 border-gray-600 text-white rounded-md p-2"
-            />
-          </div>
-          <div>
-            <label htmlFor="version" className="block text-sm font-medium text-gray-300 mb-2">
-              Version (Optional)
-            </label>
-            <input
-              type="text"
-              id="version"
-              value={version}
-              onChange={(e) => setVersion(e.target.value)}
-              placeholder="e.g., 3.12.1"
-              className="w-full bg-gray-700 border-gray-600 text-white rounded-md p-2"
-            />
-          </div>
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
-            >
-              <Send size={16} className="mr-2" />
-              {isSubmitting ? "Submitting..." : "Submit Request"}
-            </button>
-          </div>
-        </form>
+
+      {/* --- Form Card --- */}
+      <div className="bg-gray-800 p-6 rounded-xl shadow-lg max-w-2xl">
+        {isLoading ? (
+          <Spinner text="Loading devices..." />
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* --- Device Selector --- */}
+            <div>
+              <label htmlFor="device" className="block text-sm font-medium text-gray-300 mb-2">
+                Which system do you need the software on? *
+              </label>
+              <select
+                id="device"
+                value={selectedDevice}
+                onChange={(e) => setSelectedDevice(e.target.value)}
+                className="w-full bg-gray-700 border-gray-600 text-white rounded-md p-2"
+              >
+                <option value="">Select a device...</option>
+                {devices.map((device) => (
+                  <option key={device.deviceId} value={device.deviceId}>
+                    {device.labName} - {device.deviceName}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {/* --- Software Name --- */}
+            <div>
+              <label htmlFor="softwareName" className="block text-sm font-medium text-gray-300 mb-2">
+                Software Name *
+              </label>
+              <input
+                type="text"
+                id="softwareName"
+                value={softwareName}
+                onChange={(e) => setSoftwareName(e.target.value)}
+                placeholder="e.g., Python 3.12"
+                className="w-full bg-gray-700 border-gray-600 text-white rounded-md p-2"
+              />
+            </div>
+            {/* --- Version --- */}
+            <div>
+              <label htmlFor="version" className="block text-sm font-medium text-gray-300 mb-2">
+                Version (Optional)
+              </label>
+              <input
+                type="text"
+                id="version"
+                value={version}
+                onChange={(e) => setVersion(e.target.value)}
+                placeholder="e.g., 3.12.1"
+                className="w-full bg-gray-700 border-gray-600 text-white rounded-md p-2"
+              />
+            </div>
+            {/* --- Submit Button --- */}
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
+              >
+                <Send size={16} className="mr-2" />
+                {isSubmitting ? "Submitting..." : "Submit Request"}
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );

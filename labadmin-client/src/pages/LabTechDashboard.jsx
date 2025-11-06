@@ -64,7 +64,7 @@ const LabTechDashboard = () => {
 
   return (
     <div className="text-white">
-      <h1 className="text-3xl font-bold mb-6">My Assigned Tasks</h1>
+      <h1 className="text-3xl font-bold mb-6">My Assigned Tasks ({myTickets.length})</h1>
 
       {/* Tickets Table */}
       <div className="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
