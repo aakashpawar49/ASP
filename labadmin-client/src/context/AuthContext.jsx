@@ -84,7 +84,7 @@ const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     // Remove the token from the api headers
     delete api.defaults.headers.common['Authorization'];
-    navigate('/login');
+    navigate('/');
     toast.success("Logged out successfully.");
   };
 
