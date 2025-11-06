@@ -69,7 +69,7 @@ const TeacherDashboard = () => {
         <div className="flex gap-4">
           {/* Added the "Book a Lab" button */}
           <Link
-            to="/teacher/schedule"
+            to="/teacher/book-a-lab"
             className="flex items-center px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700"
           >
             <Calendar size={16} className="mr-2" />
