@@ -160,10 +160,10 @@ const Sidebar = () => {
             { to: '/admin/reports/usage', title: 'Usage Reports' },
             { to: '/admin/reports/audit', title: 'Audit Trail' },
           ]},
-          { type: 'dropdown', title: 'Settings', icon: Settings, children: [
-            { to: '/admin/settings/roles', title: 'Roles & Permissions' },
-            { to: '/admin/settings/notifications', title: 'Notifications' },
-          ]},
+          // { type: 'dropdown', title: 'Settings', icon: Settings, children: [
+          //   { to: '/admin/settings/roles', title: 'Roles & Permissions' },
+          //   { to: '/admin/settings/notifications', title: 'Notifications' },
+          // ]},
         ];
 
       // --- LABTECH ---
@@ -200,7 +200,6 @@ const Sidebar = () => {
   };
 
   const navItems = getNavItems();
-  // We use 'isExpanded' for desktop and 'isMobileOpen' for mobile
   const showText = isExpanded || isMobileOpen || isHovered;
 
   return (

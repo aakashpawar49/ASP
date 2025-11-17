@@ -26,7 +26,7 @@ import SoftwareRequests from './pages/SoftwareRequests';
 import UsageReports from './pages/UsageReports';
 import AuditTrail from './pages/AuditTrail';
 
-import RolesPermissions from './pages/RolesPermissions';
+import RolesPermissions from './pages/RolesPermission';
 
 import NotificationsSettings from './pages/NotificationsSettings';
 
