@@ -33,7 +33,9 @@ const SignInForm = () => {
       <div className="rounded-md bg-blue-900/50 border border-blue-700/50 p-4">
         <p className="text-sm font-medium text-blue-300">Test Credentials:</p>
         <p className="text-sm text-blue-400">Email: aakash12@example.com</p>
-        <p className="text-sm text-blue-400">Password: password123</p>
+        <p className="text-sm text-blue-400">Email: teacher2@example.com</p>
+        <p className="text-sm text-blue-400">Email: labtech@example.com</p>
+        <p className="text-sm text-blue-400">Email: student@example.com</p>
       </div>
 
       {/* Form */}

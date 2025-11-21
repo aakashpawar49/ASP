@@ -81,7 +81,7 @@ const TeacherRequestSoftware = () => {
               <select
                 id="device"
                 value={selectedDevice}
-                onChange={(e) => setSelectedDevice(e.g.value)}
+                onChange={(e) => setSelectedDevice(e.target.value)}
                 className="w-full bg-gray-700 border-gray-600 text-white rounded-md p-2"
               >
                 <option value="">Select a device...</option>

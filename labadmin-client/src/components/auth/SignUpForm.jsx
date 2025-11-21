@@ -76,7 +76,7 @@ const SignUpForm = () => {
             <option>Student</option>
             <option>Teacher</option>
             <option>LabTech</option>
-            <option>Admin</option>
+            {/* <option>Admin</option> */}
           </select>
         </div>
 
@@ -127,7 +127,7 @@ const SignUpForm = () => {
       {/* Available Roles Box */}
       <div className="rounded-md bg-blue-900/50 border border-blue-700/50 p-4">
         <p className="text-sm font-medium text-blue-300">Available Roles:</p>
-        <p className="text-sm text-blue-400">Student, Teacher, Lab Technician, Admin</p>
+        <p className="text-sm text-blue-400">Student, Teacher, Lab Technician</p>
       </div>
     </div>
   );
