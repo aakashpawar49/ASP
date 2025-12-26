@@ -47,12 +47,12 @@ const TechPerformanceChart = () => {
   }
 
   return (
-    <div className="bg-gray-900 p-6 rounded-xl shadow-lg h-full border border-gray-700">
+    <div className="bg-gray-900 p-6 rounded-xl shadow-lg h-full border border-gray-700" style={{ minHeight: '350px' }}>
       <h3 className="text-xl font-semibold text-white mb-4">Technician Performance</h3>
       <p className="text-sm text-gray-400 mb-4">Monthly tickets resolved by technicians</p>
-      
+
       <div style={{ width: '100%', height: '350px' }}>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
           <AreaChart
             data={data}
             margin={{

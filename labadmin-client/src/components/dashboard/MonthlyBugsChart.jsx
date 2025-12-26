@@ -33,10 +33,10 @@ const MonthlyBugsChart = () => {
   }
 
   return (
-    <div className="bg-gray-900 p-6 rounded-xl shadow-lg h-full border border-gray-700">
+    <div className="bg-gray-900 p-6 rounded-xl shadow-lg h-full border border-gray-700" style={{ minHeight: '300px' }}>
       <h3 className="text-xl font-semibold text-white mb-4">Monthly Bugs Fixed</h3>
       <div style={{ width: '100%', height: '300px' }}>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
           <BarChart
             data={data}
             margin={{

@@ -46,10 +46,10 @@ const OpenTicketsChart = () => {
   }
 
   return (
-    <div className="bg-gray-900 p-6 rounded-xl shadow-lg h-full border border-gray-700">
+    <div className="bg-gray-900 p-6 rounded-xl shadow-lg h-full border border-gray-700" style={{ minHeight: '300px' }}>
       <h3 className="text-xl font-semibold text-white mb-4">Open vs Closed Tickets</h3>
       <p className="text-sm text-gray-400 mb-2">Percentage of tickets resolved this month.</p>
-      
+
       {/* Container for chart + text overlay */}
       <div className="relative w-full h-64">
         {/* The 75% text in the middle */}
@@ -59,7 +59,7 @@ const OpenTicketsChart = () => {
         </div>
 
         {/* The Chart */}
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
           <PieChart>
             <Pie
               data={data}

@@ -39,7 +39,6 @@ const AuthProvider = ({ children }) => {
         }
       }
       
-      // We're done loading, whether we found a user or not
       setLoading(false);
     };
 
